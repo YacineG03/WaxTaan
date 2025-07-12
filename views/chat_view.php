@@ -11,37 +11,63 @@
         }
     }
     ?>
+    
     <div id="chat-container" class="flex-1 p-4 overflow-y-auto">
-        <?php foreach ($messages_to_show as $message) { ?>
-            <div class="message <?php echo $message->sender_id == $user_id ? 'sent' : 'received'; ?>">
-                <?php $sender = $users->xpath("//user[id='{$message->sender_id}']")[0]; ?>
-                <?php if ($sender->profile_photo) { ?>
-                    <img src="uploads/<?php echo htmlspecialchars($sender->profile_photo); ?>" alt="Profile" class="w-8 h-8 rounded-full inline-block mr-2">
+        <?php if (empty($messages_to_show)) { ?>
+            <div class="system-message">
+                <?php if ($current_conversation) { ?>
+                    Aucun message dans cette conversation. Commencez à discuter !
                 <?php } else { ?>
-                    <div class="w-8 h-8 bg-gray-300 rounded-full inline-block mr-2 flex items-center justify-center">?</div>
-                <?php } ?>
-                <p class="font-semibold inline-block"><?php echo htmlspecialchars($sender->firstname . ' ' . $sender->lastname); ?></p>
-                <p class="text-xs text-gray-500 inline-block ml-2"><?php echo date('d/m/Y H:i', strtotime($message['timestamp'] ?? 'now')); ?></p>
-                <p class="mt-1"><?php echo htmlspecialchars($message->content); ?></p>
-                <?php if ($message->file) { ?>
-                    <a href="uploads/<?php echo $message->file; ?>" download class="text-blue-500">Télécharger fichier</a>
-                <?php } ?>
-                <?php $is_admin = in_array($user_id, explode(',', $groups->xpath("//group[id='$id']")[0]->admin_id . ',' . ($groups->xpath("//group[id='$id']")[0]->coadmins ?? ''))); ?>
-                <?php if ($is_admin && $message->id) { ?>
-                    <a href="api.php?action=delete_message&message_id=<?php echo $message->id; ?>&group_id=<?php echo $id; ?>" class="text-red-500 ml-2">Supprimer</a>
+                    Sélectionnez un contact ou un groupe pour commencer à discuter.
                 <?php } ?>
             </div>
         <?php } ?>
+        
+        <?php foreach ($messages_to_show as $message) { ?>
+            <div class="message <?php echo $message->sender_id == $user_id ? 'sent' : 'received'; ?>">
+                <?php $sender = $users->xpath("//user[id='{$message->sender_id}']")[0]; ?>
+                
+                <div class="message-header">
+                    <?php if ($sender->profile_photo && $sender->profile_photo != 'default.jpg') { ?>
+                        <img src="uploads/<?php echo htmlspecialchars($sender->profile_photo); ?>" alt="Profile" class="message-avatar">
+                    <?php } else { ?>
+                        <div class="message-avatar bg-gray-300">
+                            <?php echo strtoupper(substr($sender->firstname, 0, 1)); ?>
+                        </div>
+                    <?php } ?>
+                    
+                    <span class="font-semibold"><?php echo htmlspecialchars($sender->firstname . ' ' . $sender->lastname); ?></span>
+                    <span class="text-xs"><?php echo date('d/m/Y H:i', strtotime($message['timestamp'] ?? 'now')); ?></span>
+                </div>
+                
+                <p><?php echo htmlspecialchars($message->content); ?></p>
+                
+                <?php if ($message->file) { ?>
+                    <a href="uploads/<?php echo $message->file; ?>" download class="file-download">
+                        📎 Télécharger fichier
+                    </a>
+                <?php } ?>
+                
+                <?php 
+                if ($current_conversation && strpos($current_conversation, 'group:') === 0) {
+                    $is_admin = in_array($user_id, explode(',', $groups->xpath("//group[id='$id']")[0]->admin_id . ',' . ($groups->xpath("//group[id='$id']")[0]->coadmins ?? '')));
+                    if ($is_admin && $message->id) { ?>
+                        <a href="api.php?action=delete_message&message_id=<?php echo $message->id; ?>&group_id=<?php echo $id; ?>" class="text-red-500 ml-2">Supprimer</a>
+                    <?php }
+                } ?>
+            </div>
+        <?php } ?>
     </div>
+    
     <?php if ($current_conversation && strpos($current_conversation, 'group:') === 0) { ?>
         <form action="api.php" method="post" enctype="multipart/form-data" class="p-4 bg-white border-t">
             <input type="hidden" name="action" value="send_message">
             <input type="hidden" name="recipient" value="<?php echo htmlspecialchars($id); ?>">
             <input type="hidden" name="recipient_type" value="group">
             <div class="flex space-x-2">
-                <textarea name="message" class="w-full p-2 border rounded" placeholder="Votre message..."></textarea>
-                <input type="file" name="file" class="p-2" accept="image/*,video/*,application/*">
-                <button type="submit" class="p-2 bg-blue-500 text-white rounded">Envoyer</button>
+                <textarea name="message" class="flex-1" placeholder="Votre message..." rows="2"></textarea>
+                <input type="file" name="file" accept="image/*,video/*,application/*">
+                <button type="submit">Envoyer</button>
             </div>
         </form>
     <?php } elseif ($current_conversation) { ?>
@@ -50,9 +76,9 @@
             <input type="hidden" name="recipient" value="<?php echo htmlspecialchars($id); ?>">
             <input type="hidden" name="recipient_type" value="contact">
             <div class="flex space-x-2">
-                <textarea name="message" class="w-full p-2 border rounded" placeholder="Votre message..."></textarea>
-                <input type="file" name="file" class="p-2" accept="image/*,video/*,application/*">
-                <button type="submit" class="p-2 bg-blue-500 text-white rounded">Envoyer</button>
+                <textarea name="message" class="flex-1" placeholder="Votre message..." rows="2"></textarea>
+                <input type="file" name="file" accept="image/*,video/*,application/*">
+                <button type="submit">Envoyer</button>
             </div>
         </form>
     <?php } ?>

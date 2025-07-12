@@ -1,0 +1,83 @@
+/* Section Contacts */
+.contacts-section {
+  border-bottom: 1px solid var(--gray-200);
+  margin-bottom: 20px;
+}
+
+.contacts-section ul {
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.contacts-section li {
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  background: white;
+  border: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  animation: fadeInUp 0.3s ease;
+}
+
+.contacts-section li:hover {
+  background: var(--gray-50);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.contacts-section li a {
+  text-decoration: none;
+  color: var(--gray-700);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.contacts-section li a:hover {
+  color: var(--primary-color);
+}
+
+/* Photo de contact */
+.contacts-section .contact-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid var(--gray-200);
+  transition: all 0.3s ease;
+}
+
+/* Statut en ligne (optionnel) */
+.contact-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-color);
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  border: 2px solid white;
+}
+
+.contact-status.offline {
+  background: var(--gray-400);
+}
+
+/* Actions de contact */
+.contact-actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.contacts-section li:hover .contact-actions {
+  opacity: 1;
+}

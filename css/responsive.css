@@ -1,0 +1,197 @@
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .flex.h-screen {
+    margin: 10px;
+  }
+
+  .p-4 {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .flex.h-screen {
+    flex-direction: column;
+    margin: 5px;
+    height: calc(100vh - 10px);
+  }
+
+  .w-1\/3,
+  .w-2\/3 {
+    width: 100%;
+  }
+
+  .w-1\/3 {
+    max-height: 50vh;
+    overflow-y: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .w-2\/3 {
+    flex: 1;
+  }
+
+  .message {
+    max-width: 95%;
+    padding: 12px 16px;
+  }
+
+  .flex.space-x-2 {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .flex.space-x-2 textarea {
+    min-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .flex.space-x-2 input[type="file"] {
+    flex: 1;
+  }
+
+  .flex.space-x-2 button {
+    flex: 1;
+    min-width: auto;
+  }
+
+  /* Sidebar mobile */
+  .p-4.border-b {
+    padding: 15px;
+  }
+
+  .p-4.border-b h1 {
+    font-size: 20px;
+  }
+
+  .p-4 h2 {
+    font-size: 16px;
+  }
+
+  /* Formulaires mobile */
+  .admin-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  form[style*="display:inline"] {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+    width: 100%;
+  }
+
+  form[style*="display:inline"] select,
+  form[style*="display:inline"] button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .flex.h-screen {
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+
+  .auth-card {
+    margin: 10px;
+    padding: 30px 20px;
+    border-radius: 15px;
+  }
+
+  .auth-card h1 {
+    font-size: 24px;
+  }
+
+  .message {
+    max-width: 98%;
+    font-size: 14px;
+  }
+
+  .p-4 {
+    padding: 12px;
+  }
+
+  .contacts-section li,
+  .groups-section li {
+    padding: 10px;
+  }
+
+  .participants-list {
+    padding: 8px;
+  }
+
+  /* Navigation mobile améliorée */
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    border-top: 1px solid var(--gray-200);
+    padding: 10px 0;
+  }
+
+  .mobile-nav button {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--gray-600);
+    font-size: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-nav button.active {
+    background: var(--primary-color);
+    color: white;
+  }
+}
+
+/* Tablettes */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .w-1\/3 {
+    width: 40%;
+  }
+
+  .w-2\/3 {
+    width: 60%;
+  }
+
+  .message {
+    max-width: 85%;
+  }
+}
+
+/* Très grands écrans */
+@media (min-width: 1440px) {
+  .flex.h-screen {
+    max-width: 1400px;
+    margin: 20px auto;
+  }
+
+  .message {
+    max-width: 70%;
+  }
+}
+
+/* Mode paysage mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .w-1\/3 {
+    max-height: 60vh;
+  }
+
+  .p-4.border-b {
+    padding: 10px 15px;
+  }
+
+  .p-4.border-b h1 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .p-4 {
+    padding: 10px 15px;
+  }
+}

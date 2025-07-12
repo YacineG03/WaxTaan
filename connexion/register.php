@@ -1,7 +1,5 @@
 <?php
 session_start();
-// require_once '../controller.php'; 
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstname = htmlspecialchars($_POST['firstname']);
@@ -35,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 move_uploaded_file($_FILES['profile_photo']['tmp_name'], 'uploads/' . $file_name);
                 $new_user->addChild('profile_photo', $file_name);
             } else {
-                $new_user->addChild('profile_photo', 'default.jpg'); // Photo par défaut
+                $new_user->addChild('profile_photo', 'default.jpg');
             }
             $users->asXML('../xmls/users.xml');
             header('Location: login.php');
@@ -51,47 +49,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription - WaxTaan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/forms.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Inscription</h1>
-        <?php if (isset($error)) { echo "<p class='text-red-500 mb-4'>$error</p>"; } ?>
-        <form method="post" enctype="multipart/form-data" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium">Prénom</label>
-                <input type="text" name="firstname" required class="w-full p-2 border rounded">
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Inscription</h1>
+            <?php if (isset($error)) { echo "<div class='auth-error'>$error</div>"; } ?>
+            
+            <form method="post" enctype="multipart/form-data" class="auth-form">
+                <div class="form-group">
+                    <label for="firstname">Prénom</label>
+                    <input type="text" id="firstname" name="firstname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastname">Nom</label>
+                    <input type="text" id="lastname" name="lastname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sex">Sexe</label>
+                    <select id="sex" name="sex" required>
+                        <option value="M">Masculin</option>
+                        <option value="F">Féminin</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Âge</label>
+                    <input type="number" id="age" name="age" required min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Numéro de téléphone</label>
+                    <input type="text" id="phone" name="phone" required pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile_photo">Photo de profil</label>
+                    <div class="file-upload">
+                        <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                        <label for="profile_photo" class="file-upload-label">
+                            📷 Choisir une photo
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit">S'inscrire</button>
+            </form>
+            
+            <div class="auth-link">
+                Déjà un compte ? <a href="login.php">Se connecter</a>
             </div>
-            <div>
-                <label class="block text-sm font-medium">Nom</label>
-                <input type="text" name="lastname" required class="w-full p-2 border rounded">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Sexe</label>
-                <select name="sex" class="w-full p-2 border rounded" required>
-                    <option value="M">Masculin</option>
-                    <option value="F">Féminin</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Âge</label>
-                <input type="number" name="age" required class="w-full p-2 border rounded">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Numéro de téléphone</label>
-                <input type="text" name="phone" required class="w-full p-2 border rounded" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Mot de passe</label>
-                <input type="password" name="password" required class="w-full p-2 border rounded">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Photo de profil</label>
-                <input type="file" name="profile_photo" class="w-full p-2 border rounded">
-            </div>
-            <button type="submit" class="w-full p-2 bg-blue-500 text-white rounded">S'inscrire</button>
-        </form>
-        <p class="mt-4 text-center">Déjà un compte ? <a href="login.php" class="text-blue-500">Se connecter</a></p>
+        </div>
     </div>
 </body>
 </html>

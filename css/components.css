@@ -1,0 +1,141 @@
+/* Boutons */
+button[type="submit"],
+.btn {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]:hover,
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+}
+
+button[type="submit"]:active,
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Boutons spécialisés */
+.bg-red-500 {
+  background: linear-gradient(135deg, var(--error-color) 0%, #dc2626 100%) !important;
+  padding: 6px 12px !important;
+  width: auto !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}
+
+.bg-green-500 {
+  background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%) !important;
+  padding: 6px 12px !important;
+  width: auto !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}
+
+.bg-blue-500 {
+  background: linear-gradient(135deg, var(--accent-color) 0%, #0284c7 100%) !important;
+}
+
+/* Photos de profil */
+.contact-item,
+img[alt="Photo"],
+img[alt="Group Photo"],
+img[alt="Profile"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid var(--gray-200);
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover,
+img[alt="Photo"]:hover,
+img[alt="Group Photo"]:hover {
+  border-color: var(--primary-color);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+/* Placeholders pour photos */
+.bg-gray-300 {
+  background: linear-gradient(135deg, var(--gray-300) 0%, var(--gray-400) 100%);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Liens d'action */
+.text-red-500,
+.text-blue-500,
+.text-yellow-500,
+.text-green-500 {
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.text-red-500 {
+  color: var(--error-color);
+}
+
+.text-red-500:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.text-blue-500 {
+  color: var(--accent-color);
+}
+
+.text-blue-500:hover {
+  background: #dbeafe;
+  color: #0284c7;
+}
+
+.text-yellow-500 {
+  color: var(--warning-color);
+}
+
+.text-yellow-500:hover {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.text-green-500 {
+  color: var(--success-color);
+}
+
+.text-green-500:hover {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* Messages d'erreur */
+.text-red-500.p-4 {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius);
+  margin: 10px;
+  animation: fadeInUp 0.3s ease;
+}

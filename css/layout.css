@@ -1,0 +1,106 @@
+/* Layout principal */
+.flex.h-screen {
+  height: 100vh;
+  display: flex;
+  box-shadow: var(--shadow-xl);
+  border-radius: 15px;
+  overflow: hidden;
+  margin: 20px;
+  background: white;
+  animation: fadeIn 0.5s ease;
+}
+
+/* Sidebar */
+.w-1\/3 {
+  width: 33.333333%;
+  background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-200) 100%);
+  border-right: 1px solid var(--gray-200);
+  animation: slideInLeft 0.6s ease;
+}
+
+/* Header de la sidebar */
+.p-4.border-b {
+  padding: 20px;
+  border-bottom: 2px solid var(--gray-200);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.p-4.border-b::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="white" opacity="0.1"/></svg>');
+  pointer-events: none;
+}
+
+.p-4.border-b h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.p-4.border-b p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.p-4.border-b a {
+  color: #fecaca;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.p-4.border-b a:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Sections de la sidebar */
+.p-4 {
+  padding: 20px;
+}
+
+.p-4 h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--gray-700);
+  border-bottom: 2px solid var(--gray-200);
+  padding-bottom: 8px;
+  position: relative;
+}
+
+.p-4 h2::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Zone de chat */
+.w-2\/3 {
+  width: 66.666667%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, var(--gray-50) 100%);
+}

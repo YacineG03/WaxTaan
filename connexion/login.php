@@ -26,24 +26,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - WaxTaan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/forms.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Connexion</h1>
-        <?php if (isset($error)) { echo "<p class='text-red-500 mb-4'>$error</p>"; } ?>
-        <form method="post" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium">Numéro de téléphone</label>
-                <input type="text" name="phone" required class="w-full p-2 border rounded" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567">
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Connexion</h1>
+            <?php if (isset($error)) { echo "<div class='auth-error'>$error</div>"; } ?>
+            
+            <form method="post" class="auth-form">
+                <div class="form-group">
+                    <label for="phone">Numéro de téléphone</label>
+                    <input type="text" id="phone" name="phone" required pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit">Se connecter</button>
+            </form>
+            
+            <div class="auth-link">
+                Pas de compte ? <a href="register.php">S'inscrire</a>
             </div>
-            <div>
-                <label class="block text-sm font-medium">Mot de passe</label>
-                <input type="password" name="password" required class="w-full p-2 border rounded">
-            </div>
-            <button type="submit" class="w-full p-2 bg-blue-500 text-white rounded">Se connecter</button>
-        </form>
-        <p class="mt-4 text-center">Pas de compte ? <a href="register.php" class="text-blue-500">S'inscrire</a></p>
+        </div>
     </div>
 </body>
 </html>

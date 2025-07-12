@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
 body {
@@ -10,6 +11,17 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
 }
+
+/* Fichier principal qui importe tous les autres CSS */
+@import url('base.css');
+@import url('layout.css');
+@import url('components.css');
+@import url('forms.css');
+@import url('contacts.css');
+@import url('groups.css');
+@import url('chat.css');
+@import url('auth.css');
+@import url('responsive.css');
 
 /* Container principal */
 .flex.h-screen {
@@ -419,11 +431,6 @@ input[type="checkbox"] {
 *:focus {
   outline: 2px solid #4f46e5;
   outline-offset: 2px;
-}
-
-/* Transitions globales */
-* {
-  transition: all 0.3s ease;
 }
 
 /* Amélioration des formulaires inline */
