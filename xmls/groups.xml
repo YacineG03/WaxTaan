@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="waxtaan.xsd">
+    <group>
+        <id>6871bf8db342d</id>
+        <name>Les girls</name>
+        <admin_id>6871aa2634117</admin_id>
+        <group_photo>default_group.png</group_photo>
+        <member_id>6871aa2634117</member_id>
+        <member_id>6871a82975833</member_id>
+        <member_id>6871ae9cd9e8d</member_id>
+    </group>
+</groups>

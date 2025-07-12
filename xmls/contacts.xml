@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="waxtaan.xsd">
+<!-- <contact><id>6871aa821a11e</id><user_id>6871aa2634117</user_id><contact_name>Yacine GUEYE</contact_name><contact_phone>777777777</contact_phone></contact><contact><id>6871aec7cc718</id><user_id>6871aa2634117</user_id><contact_name>Yaaass</contact_name><contact_phone>777777777</contact_phone></contact></contacts> -->
+    <contact>
+        <id>6871aa821a11e</id>
+        <user_id>6871aa2634117</user_id>
+        <contact_name>Yacine GUEYE</contact_name>
+        <contact_phone>777777777</contact_phone>
+    </contact>
+    <contact>
+        <id>6871aec7cc718</id>
+        <user_id>6871aa2634117</user_id>
+        <contact_name>Yaaass</contact_name>
+        <contact_phone>777777777</contact_phone>
+    </contact>
+</contacts>

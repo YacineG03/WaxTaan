@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="waxtaan.xsd">
+<!-- <user><id>6871a82975833</id><name>Yacine GUEYE</name><phone>777777777</phone><password>$2y$10$b2PmMk70nQjcrQCY0qXopeaA3NqnDuAdWrxE2DMqT4mNnR/e7dfy6</password></user> -->
+<!-- <user><id>6871aa2634117</id><firstname>Assy</firstname><lastname>NDIAYE</lastname><sex>F</sex><age>10</age><phone>778909890</phone><password>$2y$10$kJO8pmP1cftuX1mBi.YHB.j6S5uCqfx5KKWfBjrQUc0PLb.iEL./m</password><profile_photo>6871ba7449088_default.png</profile_photo></user><user><id>6871ae9cd9e8d</id><firstname>Mariama</firstname><lastname>DIOUM</lastname><sex>F</sex><age>0</age><phone>700000000</phone><password>$2y$10$ttWrHIp7uTaKVhvg82SZ.OI2umPls6InQAWGoT5wklePjCpk88OHy</password><profile_photo>default.jpg</profile_photo></user></users> -->
+    <user>
+            <id>6871a82975833</id>
+            <firstname>Yacine</firstname>
+            <lastname>GUEYE</lastname>
+            <sex>M</sex>
+            <age>20</age>
+            <phone>777777777</phone>
+            <password>$2y$10$b2PmMk70nQjcrQCY0qXopeaA3NqnDuAdWrxE2DMqT4mNnR/e7dfy6</password>
+            <profile_photo>default.jpg</profile_photo>
+        </user>
+        <user>
+            <id>6871aa2634117</id>
+            <firstname>Assy</firstname>
+            <lastname>NDIAYE</lastname>
+            <sex>F</sex>
+            <age>10</age>
+            <phone>778909890</phone>
+            <password>$2y$10$kJO8pmP1cftuX1mBi.YHB.j6S5uCqfx5KKWfBjrQUc0PLb.iEL./m</password>
+            <profile_photo>6871ba7449088_default.png</profile_photo>
+        </user>
+        <user>
+            <id>6871ae9cd9e8d</id>
+            <firstname>Mariama</firstname>
+            <lastname>DIOUM</lastname>
+            <sex>F</sex>
+            <age>0</age>
+            <phone>700000000</phone>
+            <password>$2y$10$ttWrHIp7uTaKVhvg82SZ.OI2umPls6InQAWGoT5wklePjCpk88OHy</password>
+            <profile_photo>default.jpg</profile_photo>
+        </user>
+</users>
