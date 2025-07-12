@@ -1,5 +1,7 @@
 <?php
 session_start();
+// require_once '../controller.php'; 
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstname = htmlspecialchars($_POST['firstname']);
@@ -14,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else if (!preg_match('/^(77|70|78|76)[0-9]{7}$/', $phone)) {
         $error = "Le numéro de téléphone doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres.";
     } else {
-        $users = simplexml_load_file('xmls/users.xml');
+        $users = simplexml_load_file('../xmls/users.xml');
         $user_exists = $users->xpath("//user[phone='$phone']");
         
         if ($user_exists) {
@@ -35,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $new_user->addChild('profile_photo', 'default.jpg'); // Photo par défaut
             }
-            $users->asXML('xmls/users.xml');
+            $users->asXML('../xmls/users.xml');
             header('Location: login.php');
             exit;
         }

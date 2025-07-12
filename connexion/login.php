@@ -4,12 +4,15 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = $_POST['phone'];
     $password = $_POST['password'];
-    $users = simplexml_load_file('xmls/users.xml');
-    
+    $users = simplexml_load_file('../xmls/users.xml');
+    if ($users === false) {
+        die("Erreur : impossible de charger le fichier XML des utilisateurs.");
+    }
+
     foreach ($users->user as $user) {
         if ($user->phone == $phone && password_verify($password, $user->password)) {
             $_SESSION['user_id'] = (string)$user->id;
-            header('Location: index.php');
+            header('Location: ../views/view.php'); 
             exit;
         }
     }
