@@ -29,7 +29,7 @@
                 
                 <div class="message-header">
                     <?php if ($sender->profile_photo && $sender->profile_photo != 'default.jpg') { ?>
-                        <img src="uploads/<?php echo htmlspecialchars($sender->profile_photo); ?>" alt="Profile" class="message-avatar">
+                        <img src="../uploads/<?php echo htmlspecialchars($sender->profile_photo); ?>" alt="Profile" class="message-avatar">
                     <?php } else { ?>
                         <div class="message-avatar bg-gray-300">
                             <?php echo strtoupper(substr($sender->firstname, 0, 1)); ?>
@@ -43,7 +43,7 @@
                 <p><?php echo htmlspecialchars($message->content); ?></p>
                 
                 <?php if ($message->file) { ?>
-                    <a href="uploads/<?php echo $message->file; ?>" download class="file-download">
+                    <a href="../uploads/<?php echo $message->file; ?>" download class="file-download">
                         📎 Télécharger fichier
                     </a>
                 <?php } ?>

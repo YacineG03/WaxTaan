@@ -17,7 +17,7 @@
                     <a href="?conversation=contact:<?php echo urlencode($contact->contact_phone); ?>" class="contact-link">
                         <div class="contact-info">
                             <?php if ($contact_user->profile_photo && $contact_user->profile_photo != 'default.jpg') { ?>
-                                <img src="uploads/<?php echo htmlspecialchars($contact_user->profile_photo); ?>" alt="Photo" class="contact-item">
+                                <img src="../uploads/<?php echo htmlspecialchars($contact_user->profile_photo); ?>" alt="Photo" class="contact-item">
                             <?php } else { ?>
                                 <div class="contact-item bg-gray-300">
                                     <?php echo strtoupper(substr($contact->contact_name, 0, 1)); ?>

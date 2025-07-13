@@ -34,7 +34,7 @@
                 <div class="group-header">
                     <a href="?conversation=group:<?php echo $group->id; ?>" class="group-link">
                         <?php if ($group->group_photo && $group->group_photo != 'default.jpg') { ?>
-                            <img src="uploads/<?php echo htmlspecialchars($group->group_photo); ?>" alt="Group Photo" class="group-photo">
+                            <img src="../uploads/<?php echo htmlspecialchars($group->group_photo); ?>" alt="Group Photo" class="group-photo">
                         <?php } else { ?>
                             <div class="group-photo bg-gray-300">
                                 <?php echo strtoupper(substr($group->name, 0, 1)); ?>

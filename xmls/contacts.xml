@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <contacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="waxtaan.xsd">
-<!-- <contact><id>6871aa821a11e</id><user_id>6871aa2634117</user_id><contact_name>Yacine GUEYE</contact_name><contact_phone>777777777</contact_phone></contact><contact><id>6871aec7cc718</id><user_id>6871aa2634117</user_id><contact_name>Yaaass</contact_name><contact_phone>777777777</contact_phone></contact></contacts> -->
     <contact>
         <id>6871aa821a11e</id>
         <user_id>6871aa2634117</user_id>
@@ -8,4 +7,4 @@
         <contact_phone>777777777</contact_phone>
     </contact>
     
-<contact><id>6873de1e7438a</id><user_id>6871a82975833</user_id><contact_name>Assy NDIAYE</contact_name><contact_phone>778909890</contact_phone></contact><contact><id>6873f61d8d533</id><user_id>6871aa2634117</user_id><contact_name>Maarieee</contact_name><contact_phone>700000000</contact_phone></contact></contacts>
+<contact><id>6873de1e7438a</id><user_id>6871a82975833</user_id><contact_name>Assy NDIAYE</contact_name><contact_phone>778909890</contact_phone></contact><contact><id>6873f61d8d533</id><user_id>6871aa2634117</user_id><contact_name>Maarieee</contact_name><contact_phone>700000000</contact_phone></contact><contact><id>68741e5e87602</id><user_id>6871aa2634117</user_id><contact_name>Fatima</contact_name><contact_phone>778888888</contact_phone></contact></contacts>
