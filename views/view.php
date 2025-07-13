@@ -102,6 +102,10 @@
                     <span class="nav-tab-icon">🏠</span>
                     Groupes
                 </button>
+                <button class="nav-tab" data-tab="discussions">
+                    <span class="nav-tab-icon">💬</span>
+                    Discussions
+                </button>
             </div>
 
             <!-- Contenu de la sidebar -->
@@ -157,26 +161,42 @@
                 <!-- Onglet Contacts -->
                 <div class="tab-panel" id="contacts-panel">
                     <div class="profile-section">
-                        <h2>Ajouter un Contact</h2>
-                        <form action="../api.php" method="post" class="modern-form" id="addContactForm">
-                            <input type="hidden" name="action" value="add_contact">
-                            
-                            <div class="form-group">
-                                <label class="form-label">Nom du contact</label>
-                                <input type="text" name="contact_name" class="form-input" placeholder="Nom du contact" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Numéro de téléphone</label>
-                                <input type="text" name="contact_phone" class="form-input" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567" required>
-                                <small class="form-help">Le numéro doit correspondre à un utilisateur existant</small>
-                            </div>
-                            
-                            <button type="submit" class="modern-btn btn-primary">
+                        <div class="section-header">
+                            <h2>Mes Contacts</h2>
+                            <button type="button" onclick="showAddContactForm()" class="modern-btn btn-primary">
                                 <span>➕</span>
-                                Ajouter Contact
+                                Ajouter un Contact
                             </button>
-                        </form>
+                        </div>
+                        
+                        <!-- Formulaire d'ajout caché -->
+                        <div id="addContactForm" style="display: none;">
+                            <form action="../api.php" method="post" class="modern-form">
+                                <input type="hidden" name="action" value="add_contact">
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Nom du contact</label>
+                                    <input type="text" name="contact_name" class="form-input" placeholder="Nom du contact" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Numéro de téléphone</label>
+                                    <input type="text" name="contact_phone" class="form-input" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567" required>
+                                    <small class="form-help">Le numéro doit correspondre à un utilisateur existant</small>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="modern-btn btn-primary">
+                                        <span>➕</span>
+                                        Ajouter Contact
+                                    </button>
+                                    <button type="button" onclick="hideAddContactForm()" class="modern-btn btn-secondary">
+                                        <span>❌</span>
+                                        Annuler
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="modern-list">
@@ -184,7 +204,6 @@
                             <?php
                             $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
                             if ($contact_user) {
-                                $unread_count = getUnreadMessageCount($messages, $current_user->phone, $contact->contact_phone);
                             ?>
                                 <div class="list-item">
                                     <div class="item-avatar">
@@ -196,30 +215,28 @@
                                     </div>
                                     
                                     <div class="item-content">
-                                        <div class="item-name">
-                                            <?php echo htmlspecialchars($contact->contact_name); ?>
-                                            <?php if ($unread_count > 0) { ?>
-                                                <span class="unread-badge"><?php echo $unread_count; ?></span>
-                                            <?php } ?>
-                                        </div>
-                                        <div class="item-meta">
-                                            <?php echo htmlspecialchars($contact->contact_phone); ?>
-                                            <?php if ($unread_count > 0) { ?>
-                                                <span class="unread-indicator">Nouveaux messages</span>
-                                            <?php } ?>
-                                        </div>
+                                        <div class="item-name"><?php echo htmlspecialchars($contact->contact_name); ?></div>
+                                        <div class="item-meta"><?php echo htmlspecialchars($contact->contact_phone); ?></div>
                                     </div>
                                     
                                     <div class="item-actions">
-                                        <a href="?conversation=contact:<?php echo urlencode($contact->contact_phone); ?>" class="modern-btn btn-secondary btn-small">
-                                            💬 Chat
-                                        </a>
+                                        <button type="button" onclick="editContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>', '<?php echo htmlspecialchars($contact->contact_phone); ?>')" class="modern-btn btn-secondary btn-small">
+                                            ✏️
+                                        </button>
                                         <button type="button" onclick="confirmDeleteContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-danger btn-small">
                                             🗑️
                                         </button>
                                     </div>
                                 </div>
                             <?php } ?>
+                        <?php } ?>
+                        
+                        <?php if (empty($contacts->xpath("//contact[user_id='$user_id']"))) { ?>
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <h3>Aucun contact</h3>
+                                <p>Ajoutez votre premier contact pour commencer à discuter.</p>
+                            </div>
                         <?php } ?>
                     </div>
                 </div>
@@ -304,6 +321,123 @@
                         <?php } ?>
                     </div>
                 </div>
+
+                <!-- Onglet Discussions -->
+                <div class="tab-panel" id="discussions-panel">
+                    <div class="profile-section">
+                        <h2>Mes Discussions</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 16px;">Consultez vos conversations avec vos contacts</p>
+                    </div>
+
+                    <div class="modern-list">
+                        <?php
+                        // Récupérer tous les contacts avec leurs messages
+                        $user_contacts = $contacts->xpath("//contact[user_id='$user_id']");
+                        $discussions = [];
+                        
+                        foreach ($user_contacts as $contact) {
+                            $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
+                            if ($contact_user) {
+                                $unread_count = getUnreadMessageCount($messages, $current_user->phone, $contact->contact_phone);
+                                
+                                // Récupérer le dernier message de cette conversation
+                                $contact_user_id = getUserIDByPhone($users, $contact->contact_phone);
+                                $conversation_messages = $messages->xpath("//message[(sender_id='$user_id' and recipient='$contact->contact_phone') or (sender_id='$contact_user_id' and recipient='$current_user->phone')]");
+                                
+                                if (!empty($conversation_messages)) {
+                                    $latest_message = end($conversation_messages);
+                                    $discussions[] = [
+                                        'contact' => $contact,
+                                        'contact_user' => $contact_user,
+                                        'unread_count' => $unread_count,
+                                        'latest_message' => $latest_message,
+                                        'message_count' => count($conversation_messages)
+                                    ];
+                                } else {
+                                    // Contact sans messages
+                                    $discussions[] = [
+                                        'contact' => $contact,
+                                        'contact_user' => $contact_user,
+                                        'unread_count' => 0,
+                                        'latest_message' => null,
+                                        'message_count' => 0
+                                    ];
+                                }
+                            }
+                        }
+                        
+                        // Trier les discussions par date du dernier message (plus récent en premier)
+                        usort($discussions, function($a, $b) {
+                            if ($a['latest_message'] && $b['latest_message']) {
+                                return strtotime($b['latest_message']['timestamp']) - strtotime($a['latest_message']['timestamp']);
+                            } elseif ($a['latest_message']) {
+                                return -1;
+                            } elseif ($b['latest_message']) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        
+                        foreach ($discussions as $discussion) {
+                            $contact = $discussion['contact'];
+                            $contact_user = $discussion['contact_user'];
+                            $unread_count = $discussion['unread_count'];
+                            $latest_message = $discussion['latest_message'];
+                            $message_count = $discussion['message_count'];
+                        ?>
+                            <div class="list-item discussion-item">
+                                <div class="item-avatar">
+                                    <?php if ($contact_user->profile_photo && $contact_user->profile_photo != 'default.jpg') { ?>
+                                        <img src="uploads/<?php echo htmlspecialchars($contact_user->profile_photo); ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                    <?php } else { ?>
+                                        <?php echo strtoupper(substr($contact->contact_name, 0, 1)); ?>
+                                    <?php } ?>
+                                </div>
+                                
+                                <div class="item-content">
+                                    <div class="item-name">
+                                        <?php echo htmlspecialchars($contact->contact_name); ?>
+                                        <?php if ($unread_count > 0) { ?>
+                                            <span class="unread-badge"><?php echo $unread_count; ?></span>
+                                        <?php } ?>
+                                    </div>
+                                    <div class="item-meta">
+                                        <?php if ($latest_message) { ?>
+                                            <?php 
+                                            $sender = $users->xpath("//user[id='{$latest_message->sender_id}']")[0];
+                                            $is_sent_by_me = $latest_message->sender_id == $user_id;
+                                            ?>
+                                            <span class="message-preview">
+                                                <?php echo $is_sent_by_me ? 'Vous: ' : ''; ?>
+                                                <?php echo htmlspecialchars(substr($latest_message->content, 0, 50)); ?>
+                                                <?php if (strlen($latest_message->content) > 50) echo '...'; ?>
+                                            </span>
+                                            <span class="message-time">
+                                                <?php echo date('d/m H:i', strtotime($latest_message['timestamp'] ?? 'now')); ?>
+                                            </span>
+                                        <?php } else { ?>
+                                            <span class="no-messages">Aucun message</span>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="item-actions">
+                                    <a href="?conversation=contact:<?php echo urlencode($contact->contact_phone); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
+                                        💬 Ouvrir
+                                    </a>
+                                </div>
+                            </div>
+                        <?php } ?>
+                        
+                        <?php if (empty($discussions)) { ?>
+                            <div class="empty-state">
+                                <div class="empty-icon">💬</div>
+                                <h3>Aucune discussion</h3>
+                                <p>Commencez à discuter avec vos contacts pour voir vos conversations ici.</p>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -381,10 +515,34 @@
                                     <p><?php echo htmlspecialchars($message->content); ?></p>
                                     
                                     <?php if ($message->file) { ?>
-                                        <div style="margin-top: 8px;">
-                                            <a href="uploads/<?php echo $message->file; ?>" download style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 12px;">
-                                                📎 Fichier joint
-                                            </a>
+                                        <div class="message-file" style="margin-top: 8px;">
+                                            <?php
+                                            $file_extension = strtolower(pathinfo($message->file, PATHINFO_EXTENSION));
+                                            $is_image = in_array($file_extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                            $is_video = in_array($file_extension, ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']);
+                                            ?>
+                                            
+                                            <?php if ($is_image) { ?>
+                                                <!-- Affichage des images -->
+                                                <div class="file-preview">
+                                                    <img src="uploads/<?php echo htmlspecialchars($message->file); ?>" alt="Image" class="message-image" onclick="openImageModal('uploads/<?php echo htmlspecialchars($message->file); ?>')">
+                                                </div>
+                                            <?php } elseif ($is_video) { ?>
+                                                <!-- Affichage des vidéos -->
+                                                <div class="file-preview">
+                                                    <video controls class="message-video">
+                                                        <source src="uploads/<?php echo htmlspecialchars($message->file); ?>" type="video/<?php echo $file_extension; ?>">
+                                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                                    </video>
+                                                </div>
+                                            <?php } else { ?>
+                                                <!-- Affichage des autres fichiers -->
+                                                <a href="uploads/<?php echo htmlspecialchars($message->file); ?>" download class="file-download">
+                                                    <span class="file-icon">📎</span>
+                                                    <span class="file-name"><?php echo htmlspecialchars($message->file); ?></span>
+                                                    <span class="file-size">Télécharger</span>
+                                                </a>
+                                            <?php } ?>
                                         </div>
                                     <?php } ?>
                                 </div>
@@ -442,6 +600,14 @@
         <input type="hidden" name="contact_id" id="contactIdToDelete">
     </form>
 
+    <!-- Modal pour afficher les images -->
+    <div id="imageModal" class="image-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeImageModal()">&times;</span>
+            <img id="modalImage" src="" alt="Image" class="modal-image">
+        </div>
+    </div>
+
     <script>
         // Gestion des onglets
         document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -456,6 +622,24 @@
             });
         });
 
+        // Maintenir l'onglet actif selon l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+        if (activeTab) {
+            // Retirer la classe active de tous les onglets
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            
+            // Ajouter la classe active à l'onglet spécifié
+            const targetTab = document.querySelector(`[data-tab="${activeTab}"]`);
+            const targetPanel = document.getElementById(activeTab + '-panel');
+            
+            if (targetTab && targetPanel) {
+                targetTab.classList.add('active');
+                targetPanel.classList.add('active');
+            }
+        }
+
         // Fonction de confirmation pour la suppression de contact
         function confirmDeleteContact(contactId, contactName) {
             if (confirm(`Êtes-vous sûr de vouloir supprimer le contact "${contactName}" ?\n\nCette action est irréversible.`)) {
@@ -463,6 +647,41 @@
                 document.getElementById('deleteContactForm').submit();
             }
         }
+
+        // Fonctions pour l'ajout de contact
+        function showAddContactForm() {
+            document.getElementById('addContactForm').style.display = 'block';
+            document.querySelector('#addContactForm input[name="contact_name"]').focus();
+        }
+
+        function hideAddContactForm() {
+            document.getElementById('addContactForm').style.display = 'none';
+            document.getElementById('addContactForm').querySelector('form').reset();
+        }
+
+        // Fonction pour l'édition de contact (à implémenter plus tard)
+        function editContact(contactId, contactName, contactPhone) {
+            alert(`Édition du contact "${contactName}" (${contactPhone})\n\nCette fonctionnalité sera implémentée prochainement.`);
+        }
+
+        // Fonctions pour le modal d'image
+        function openImageModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
 
         // Validation du formulaire d'ajout de contact
         document.getElementById('addContactForm').addEventListener('submit', function(e) {
