@@ -1,7 +1,7 @@
 <div class="p-4 contacts-section">
     <h2>Contacts</h2>
     
-    <form action="api.php" method="post" class="space-y-2">
+    <form action="../api.php" method="post" class="space-y-2">
         <input type="hidden" name="action" value="add_contact">
         <input type="text" name="contact_name" placeholder="Nom du contact" required>
         <input type="text" name="contact_phone" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567" required>
@@ -27,7 +27,7 @@
                         </div>
                     </a>
                     <div class="contact-actions">
-                        <a href="api.php?action=delete_contact&contact_id=<?php echo $contact->id; ?>" class="text-red-500">Supprimer</a>
+                        <a href="../api.php?action=delete_contact&contact_id=<?php echo $contact->id; ?>" class="text-red-500">Supprimer</a>
                     </div>
                 <?php } ?>
             </li>

@@ -146,7 +146,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 WaxTaan. Fait avec ❤️ au Sénégal</p>
+                <p>&copy; 2024 WaxTaan. Fait avec Fait avec le groupe 2 de XML❤️ au Sénégal</p>
             </div>
         </div>
     </footer>

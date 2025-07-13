@@ -13,8 +13,63 @@
 </head>
 <body>
     <?php
-    if (isset($_GET['error']) && $_GET['error'] === 'minimum_two_members') {
-        echo "<div style='position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(240, 147, 251, 0.3); z-index: 1000;'>Erreur : Vous devez sélectionner au moins deux contacts pour créer un groupe.</div>";
+    // Notifications d'erreur et de succès
+    if (isset($_GET['error'])) {
+        $error_message = '';
+        switch ($_GET['error']) {
+            case 'minimum_two_members':
+                $error_message = 'Erreur : Vous devez sélectionner au moins deux contacts pour créer un groupe.';
+                break;
+            case 'contact_not_found':
+                $error_message = 'Erreur : Contact introuvable.';
+                break;
+            case 'unauthorized':
+                $error_message = 'Erreur : Vous n\'êtes pas autorisé à supprimer ce contact.';
+                break;
+            case 'delete_failed':
+                $error_message = 'Erreur : Échec de la suppression du contact.';
+                break;
+            case 'missing_contact_id':
+                $error_message = 'Erreur : ID du contact manquant.';
+                break;
+            case 'contact_already_exists':
+                $error_message = 'Erreur : Ce contact existe déjà dans votre liste.';
+                break;
+            case 'user_not_found':
+                $error_message = 'Erreur : Aucun utilisateur trouvé avec ce numéro de téléphone.';
+                break;
+            case 'cannot_add_self':
+                $error_message = 'Erreur : Vous ne pouvez pas vous ajouter vous-même comme contact.';
+                break;
+            case 'add_failed':
+                $error_message = 'Erreur : Échec de l\'ajout du contact.';
+                break;
+            case 'missing_contact_data':
+                $error_message = 'Erreur : Données du contact manquantes.';
+                break;
+            default:
+                $error_message = 'Une erreur est survenue.';
+        }
+        if ($error_message) {
+            echo "<div style='position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(240, 147, 251, 0.3); z-index: 1000;'>$error_message</div>";
+        }
+    }
+    
+    if (isset($_GET['success'])) {
+        $success_message = '';
+        switch ($_GET['success']) {
+            case 'contact_deleted':
+                $success_message = '✅ Contact supprimé avec succès !';
+                break;
+            case 'contact_added':
+                $success_message = '✅ Contact ajouté avec succès !';
+                break;
+            default:
+                $success_message = 'Opération réussie !';
+        }
+        if ($success_message) {
+            echo "<div style='position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3); z-index: 1000;'>$success_message</div>";
+        }
     }
     ?>
     
@@ -55,7 +110,7 @@
                 <div class="tab-panel active" id="profile-panel">
                     <div class="profile-section">
                         <h2>Modifier le Profil</h2>
-                        <form action="api.php" method="post" enctype="multipart/form-data" class="modern-form">
+                        <form action="../api.php" method="post" enctype="multipart/form-data" class="modern-form">
                             <input type="hidden" name="action" value="update_profile">
                             
                             <div class="form-group">
@@ -103,7 +158,7 @@
                 <div class="tab-panel" id="contacts-panel">
                     <div class="profile-section">
                         <h2>Ajouter un Contact</h2>
-                        <form action="api.php" method="post" class="modern-form">
+                        <form action="../api.php" method="post" class="modern-form" id="addContactForm">
                             <input type="hidden" name="action" value="add_contact">
                             
                             <div class="form-group">
@@ -114,6 +169,7 @@
                             <div class="form-group">
                                 <label class="form-label">Numéro de téléphone</label>
                                 <input type="text" name="contact_phone" class="form-input" pattern="(77|70|78|76)[0-9]{7}" title="Numéro doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres" placeholder="ex: 771234567" required>
+                                <small class="form-help">Le numéro doit correspondre à un utilisateur existant</small>
                             </div>
                             
                             <button type="submit" class="modern-btn btn-primary">
@@ -127,7 +183,9 @@
                         <?php foreach ($contacts->xpath("//contact[user_id='$user_id']") as $contact) { ?>
                             <?php
                             $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
-                            if ($contact_user) { ?>
+                            if ($contact_user) {
+                                $unread_count = getUnreadMessageCount($messages, $current_user->phone, $contact->contact_phone);
+                            ?>
                                 <div class="list-item">
                                     <div class="item-avatar">
                                         <?php if ($contact_user->profile_photo && $contact_user->profile_photo != 'default.jpg') { ?>
@@ -138,17 +196,27 @@
                                     </div>
                                     
                                     <div class="item-content">
-                                        <div class="item-name"><?php echo htmlspecialchars($contact->contact_name); ?></div>
-                                        <div class="item-meta"><?php echo htmlspecialchars($contact->contact_phone); ?></div>
+                                        <div class="item-name">
+                                            <?php echo htmlspecialchars($contact->contact_name); ?>
+                                            <?php if ($unread_count > 0) { ?>
+                                                <span class="unread-badge"><?php echo $unread_count; ?></span>
+                                            <?php } ?>
+                                        </div>
+                                        <div class="item-meta">
+                                            <?php echo htmlspecialchars($contact->contact_phone); ?>
+                                            <?php if ($unread_count > 0) { ?>
+                                                <span class="unread-indicator">Nouveaux messages</span>
+                                            <?php } ?>
+                                        </div>
                                     </div>
                                     
                                     <div class="item-actions">
                                         <a href="?conversation=contact:<?php echo urlencode($contact->contact_phone); ?>" class="modern-btn btn-secondary btn-small">
                                             💬 Chat
                                         </a>
-                                        <a href="api.php?action=delete_contact&contact_id=<?php echo $contact->id; ?>" class="modern-btn btn-danger btn-small">
+                                        <button type="button" onclick="confirmDeleteContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-danger btn-small">
                                             🗑️
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -160,7 +228,7 @@
                 <div class="tab-panel" id="groups-panel">
                     <div class="profile-section">
                         <h2>Créer un Groupe</h2>
-                        <form action="api.php" method="post" enctype="multipart/form-data" class="modern-form">
+                        <form action="../api.php" method="post" enctype="multipart/form-data" class="modern-form">
                             <input type="hidden" name="action" value="create_group">
                             
                             <div class="form-group">
@@ -223,11 +291,11 @@
                                         💬 Chat
                                     </a>
                                     <?php if ((string)$group->admin_id === $user_id) { ?>
-                                        <a href="api.php?action=delete_group&group_id=<?php echo $group->id; ?>" class="modern-btn btn-danger btn-small">
+                                        <a href="../api.php?action=delete_group&group_id=<?php echo $group->id; ?>" class="modern-btn btn-danger btn-small">
                                             🗑️
                                         </a>
                                     <?php } else { ?>
-                                        <a href="api.php?action=leave_group&group_id=<?php echo $group->id; ?>" class="modern-btn btn-danger btn-small">
+                                        <a href="../api.php?action=leave_group&group_id=<?php echo $group->id; ?>" class="modern-btn btn-danger btn-small">
                                             🚪
                                         </a>
                                     <?php } ?>
@@ -250,13 +318,24 @@
             if ($current_conversation) {
                 list($type, $id) = explode(':', $current_conversation);
                 if ($type === 'contact') {
-                    $messages_to_show = $messages->xpath("//message[(sender_id='$user_id' and recipient='$id') or (sender_id='$id' and recipient='$user_id')]");
-                    $contact_info = $contacts->xpath("//contact[user_id='$user_id' and contact_phone='$id']")[0];
+                    // Utiliser la fonction de correspondance
+                    $contact_user_id = getUserIDByPhone($users, $id);
+                    
+                    if ($contact_user_id) {
+                        // Récupérer les messages entre les deux utilisateurs
+                        $messages_to_show = $messages->xpath("//message[(sender_id='$user_id' and recipient='$id') or (sender_id='$contact_user_id' and recipient='$current_user->phone')]");
+                    } else {
+                        $messages_to_show = [];
+                    }
+                    
+                    $contact_info_result = $contacts->xpath("//contact[user_id='$user_id' and contact_phone='$id']");
+                    $contact_info = !empty($contact_info_result) ? $contact_info_result[0] : null;
                     $conversation_name = $contact_info ? htmlspecialchars($contact_info->contact_name) : 'Contact';
                     $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                 } elseif ($type === 'group') {
                     $messages_to_show = $messages->xpath("//message[recipient_group='$id']");
-                    $group_info = $groups->xpath("//group[id='$id']")[0];
+                    $group_info_result = $groups->xpath("//group[id='$id']");
+                    $group_info = !empty($group_info_result) ? $group_info_result[0] : null;
                     $conversation_name = $group_info ? htmlspecialchars($group_info->name) : 'Groupe';
                     $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                 }
@@ -270,7 +349,7 @@
                     <div class="chat-info">
                         <h3><?php echo $conversation_name; ?></h3>
                         <div class="chat-status">
-                            <?php if ($type === 'group') { ?>
+                            <?php if ($type === 'group' && $group_info) { ?>
                                 <?php echo count($group_info->member_id); ?> membres
                             <?php } else { ?>
                                 En ligne
@@ -322,7 +401,7 @@
 
                 <!-- Zone de saisie -->
                 <div class="chat-input">
-                    <form action="api.php" method="post" enctype="multipart/form-data">
+                    <form action="../api.php" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="send_message">
                         <input type="hidden" name="recipient" value="<?php echo htmlspecialchars($id); ?>">
                         <input type="hidden" name="recipient_type" value="<?php echo $type; ?>">
@@ -357,6 +436,12 @@
         </div>
     </div>
 
+    <!-- Formulaire caché pour la suppression de contact -->
+    <form id="deleteContactForm" action="../api.php" method="post" style="display: none;">
+        <input type="hidden" name="action" value="delete_contact">
+        <input type="hidden" name="contact_id" id="contactIdToDelete">
+    </form>
+
     <script>
         // Gestion des onglets
         document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -369,6 +454,43 @@
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.tab + '-panel').classList.add('active');
             });
+        });
+
+        // Fonction de confirmation pour la suppression de contact
+        function confirmDeleteContact(contactId, contactName) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer le contact "${contactName}" ?\n\nCette action est irréversible.`)) {
+                document.getElementById('contactIdToDelete').value = contactId;
+                document.getElementById('deleteContactForm').submit();
+            }
+        }
+
+        // Validation du formulaire d'ajout de contact
+        document.getElementById('addContactForm').addEventListener('submit', function(e) {
+            const contactName = this.querySelector('input[name="contact_name"]').value.trim();
+            const contactPhone = this.querySelector('input[name="contact_phone"]').value.trim();
+            
+            // Vérifier que le nom n'est pas vide
+            if (contactName.length < 2) {
+                e.preventDefault();
+                alert('Le nom du contact doit contenir au moins 2 caractères.');
+                return false;
+            }
+            
+            // Vérifier le format du numéro de téléphone
+            const phonePattern = /^(77|70|78|76)[0-9]{7}$/;
+            if (!phonePattern.test(contactPhone)) {
+                e.preventDefault();
+                alert('Le numéro de téléphone doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres.');
+                return false;
+            }
+            
+            // Vérifier que l'utilisateur ne s'ajoute pas lui-même
+            const currentUserPhone = '<?php echo $current_user->phone; ?>';
+            if (contactPhone === currentUserPhone) {
+                e.preventDefault();
+                alert('Vous ne pouvez pas vous ajouter vous-même comme contact.');
+                return false;
+            }
         });
 
         // Auto-scroll du chat
@@ -386,7 +508,7 @@
             });
         }
 
-        // Notification pour les erreurs
+        // Notification pour les erreurs et succès
         setTimeout(() => {
             const errorNotif = document.querySelector('[style*="position: fixed"]');
             if (errorNotif) {

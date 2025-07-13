@@ -52,7 +52,7 @@
                 if ($current_conversation && strpos($current_conversation, 'group:') === 0) {
                     $is_admin = in_array($user_id, explode(',', $groups->xpath("//group[id='$id']")[0]->admin_id . ',' . ($groups->xpath("//group[id='$id']")[0]->coadmins ?? '')));
                     if ($is_admin && $message->id) { ?>
-                        <a href="api.php?action=delete_message&message_id=<?php echo $message->id; ?>&group_id=<?php echo $id; ?>" class="text-red-500 ml-2">Supprimer</a>
+                        <a href="../ api.php?action=delete_message&message_id=<?php echo $message->id; ?>&group_id=<?php echo $id; ?>" class="text-red-500 ml-2">Supprimer</a>
                     <?php }
                 } ?>
             </div>
@@ -60,7 +60,7 @@
     </div>
     
     <?php if ($current_conversation && strpos($current_conversation, 'group:') === 0) { ?>
-        <form action="api.php" method="post" enctype="multipart/form-data" class="p-4 bg-white border-t">
+        <form action="../api.php" method="post" enctype="multipart/form-data" class="p-4 bg-white border-t">
             <input type="hidden" name="action" value="send_message">
             <input type="hidden" name="recipient" value="<?php echo htmlspecialchars($id); ?>">
             <input type="hidden" name="recipient_type" value="group">
@@ -71,7 +71,7 @@
             </div>
         </form>
     <?php } elseif ($current_conversation) { ?>
-        <form action="api.php" method="post" enctype="multipart/form-data" class="p-4 bg-white border-t">
+        <form action="../api.php" method="post" enctype="multipart/form-data" class="p-4 bg-white border-t">
             <input type="hidden" name="action" value="send_message">
             <input type="hidden" name="recipient" value="<?php echo htmlspecialchars($id); ?>">
             <input type="hidden" name="recipient_type" value="contact">

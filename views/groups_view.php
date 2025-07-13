@@ -1,7 +1,7 @@
 <div class="p-4 groups-section">
     <h2>Groupes</h2>
     
-    <form action="api.php" method="post" enctype="multipart/form-data" class="space-y-2">
+    <form action="../api.php" method="post" enctype="multipart/form-data" class="space-y-2">
         <input type="hidden" name="action" value="create_group">
         <input type="text" name="group_name" placeholder="Nom du groupe" required>
         <div class="file-upload">
@@ -51,9 +51,9 @@
                 
                 <?php if ($is_admin) { ?>
                     <div class="admin-actions">
-                        <a href="api.php?action=delete_group&group_id=<?php echo $group->id; ?>" class="text-red-500">Supprimer</a>
+                        <a href="../api.php?action=delete_group&group_id=<?php echo $group->id; ?>" class="text-red-500">Supprimer</a>
                         
-                        <form action="api.php" method="post" style="display:inline;">
+                        <form action="../api.php" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="remove_member">
                             <input type="hidden" name="group_id" value="<?php echo $group->id; ?>">
                             <select name="member_id" required>
@@ -69,7 +69,7 @@
                             <button type="submit" class="bg-red-500">Retirer</button>
                         </form>
                         
-                        <form action="api.php" method="post" style="display:inline;">
+                        <form action="../api.php" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="add_coadmin">
                             <input type="hidden" name="group_id" value="<?php echo $group->id; ?>">
                             <select name="coadmin_id" required>
@@ -87,7 +87,7 @@
                     </div>
                 <?php } ?>
                 
-                <a href="api.php?action=leave_group&group_id=<?php echo $group->id; ?>" class="text-yellow-500">Quitter</a>
+                <a href="../api.php?action=leave_group&group_id=<?php echo $group->id; ?>" class="text-yellow-500">Quitter</a>
                 
                 <div class="participants-list">
                     <h3>Participants :</h3>

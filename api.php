@@ -54,27 +54,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
                 $users->asXML('xmls/users.xml');
             }
-            header('Location: index.php');
+            header('Location: views/view.php');
             exit;
 
         case 'add_contact':
             // Ajouter un contact
             if (isset($_POST['contact_name'], $_POST['contact_phone'])) {
+                $contact_name = htmlspecialchars($_POST['contact_name']);
+                $contact_phone = htmlspecialchars($_POST['contact_phone']);
+                
+                // Vérifier si le contact existe déjà pour cet utilisateur
+                $existing_contact = $contacts->xpath("//contact[user_id='$user_id' and contact_phone='$contact_phone']")[0];
+                
+                if ($existing_contact) {
+                    // Le contact existe déjà
+                    header('Location: views/view.php?error=contact_already_exists');
+                    exit;
+                }
+                
+                // Vérifier si le numéro de téléphone correspond à un utilisateur existant
+                $user_exists = $users->xpath("//user[phone='$contact_phone']")[0];
+                if (!$user_exists) {
+                    // L'utilisateur n'existe pas
+                    header('Location: views/view.php?error=user_not_found');
+                    exit;
+                }
+                
+                // Vérifier que l'utilisateur ne s'ajoute pas lui-même
+                if ($contact_phone === $current_user->phone) {
+                    header('Location: views/view.php?error=cannot_add_self');
+                    exit;
+                }
+                
+                // Ajouter le contact
                 $contact = $contacts->addChild('contact');
                 $contact->addChild('id', uniqid());
                 $contact->addChild('user_id', $user_id);
-                $contact->addChild('contact_name', htmlspecialchars($_POST['contact_name']));
-                $contact->addChild('contact_phone', htmlspecialchars($_POST['contact_phone']));
-                $contacts->asXML('xmls/contacts.xml');
+                $contact->addChild('contact_name', $contact_name);
+                $contact->addChild('contact_phone', $contact_phone);
+                
+                // Sauvegarder le fichier
+                $result = $contacts->asXML('xmls/contacts.xml');
+                
+                if ($result) {
+                    header('Location: views/view.php?success=contact_added');
+                } else {
+                    header('Location: views/view.php?error=add_failed');
+                }
+            } else {
+                header('Location: views/view.php?error=missing_contact_data');
             }
-            header('Location: index.php');
             exit;
 
         case 'create_group':
             // Créer un groupe
             if (!isset($_POST['member_ids']) || count($_POST['member_ids']) < 2) {
-                header('Location: index.php?error=minimum_two_members');
-                exit;
+                            header('Location: views/view.php?error=minimum_two_members');
+            exit;
             }
             $group = $groups->addChild('group');
             $group->addChild('id', uniqid());
@@ -92,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $group->addChild('member_id', htmlspecialchars($member_id));
             }
             $groups->asXML('xmls/groups.xml');
-            header('Location: index.php');
+            header('Location: views/view.php');
             exit;
 
         case 'send_message':
@@ -104,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $message->addChild('content', htmlspecialchars($_POST['message']));
                 $message->addAttribute('timestamp', date('Y-m-d H:i:s'));
                 if ($_POST['recipient_type'] === 'contact') {
+                    // Pour les contacts, on stocke le numéro de téléphone du destinataire
                     $message->addChild('recipient', htmlspecialchars($_POST['recipient']));
                 } elseif ($_POST['recipient_type'] === 'group') {
                     $message->addChild('recipient_group', htmlspecialchars($_POST['recipient']));
@@ -118,19 +155,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
                 $messages->asXML('xmls/messages.xml');
             }
-            header('Location: index.php?conversation=' . ($_POST['recipient_type'] === 'group' ? 'group:' : 'contact:') . urlencode($_POST['recipient']));
+            header('Location: views/view.php?conversation=' . ($_POST['recipient_type'] === 'group' ? 'group:' : 'contact:') . urlencode($_POST['recipient']));
             exit;
 
         case 'delete_contact':
-            if (isset($_GET['contact_id'])) {
-                $contact = $contacts->xpath("//contact[id='" . $_GET['contact_id'] . "']")[0];
-                if ($contact && (string)$contact->user_id === $user_id) {
-                    $dom = dom_import_simplexml($contact);
-                    $dom->parentNode->removeChild($dom);
-                    $contacts->asXML('xmls/contacts.xml');
+            // Supprimer un contact
+            if (isset($_POST['contact_id'])) {
+                $contact_id = htmlspecialchars($_POST['contact_id']);
+                
+                // Vérifier que le contact existe
+                $contact = $contacts->xpath("//contact[id='$contact_id']")[0];
+                
+                if ($contact) {
+                    // Vérifier que l'utilisateur connecté est le propriétaire du contact
+                    if ((string)$contact->user_id === $user_id) {
+                        // Supprimer le contact
+                        $dom = dom_import_simplexml($contact);
+                        $dom->parentNode->removeChild($dom);
+                        
+                        // Sauvegarder le fichier
+                        $result = $contacts->asXML('xmls/contacts.xml');
+                        
+                        if ($result) {
+                            header('Location: views/view.php?success=contact_deleted');
+                        } else {
+                            header('Location: views/view.php?error=delete_failed');
+                        }
+                    } else {
+                        header('Location: views/view.php?error=unauthorized');
+                    }
+                } else {
+                    header('Location: views/view.php?error=contact_not_found');
                 }
+            } else {
+                header('Location: views/view.php?error=missing_contact_id');
             }
-            header('Location: index.php');
             exit;
 
         case 'delete_group':
@@ -229,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $messages->asXML('xmls/messages.xml');
                 }
             }
-            header('Location: index.php?conversation=group:' . urlencode($_GET['group_id']));
+            header('Location: views/view.php?conversation=group:' . urlencode($_GET['group_id']));
             exit;
 
         case 'list_members':

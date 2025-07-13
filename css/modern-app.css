@@ -235,6 +235,14 @@
   border-color: #a0aec0;
 }
 
+.form-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* Boutons modernes */
 .modern-btn {
   padding: 12px 24px;
@@ -628,6 +636,52 @@
   background: linear-gradient(135deg, #5a67d8, #6b46c1);
 }
 
+/* Indicateurs de nouveaux messages */
+.unread-badge {
+  background: var(--secondary-gradient);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  min-width: 16px;
+  text-align: center;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.unread-indicator {
+  color: var(--primary-gradient);
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 8px;
+  opacity: 0.8;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Amélioration de l'affichage des contacts avec nouveaux messages */
+.list-item:has(.unread-badge) {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  border-left: 3px solid var(--primary-gradient);
+}
+
+.list-item:has(.unread-badge) .item-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-container {
@@ -650,6 +704,16 @@
 
   .message-bubble {
     max-width: 85%;
+  }
+
+  .unread-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-width: 14px;
+  }
+  
+  .unread-indicator {
+    font-size: 10px;
   }
 }
 
