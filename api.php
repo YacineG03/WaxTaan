@@ -671,6 +671,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo "<p>ID du groupe manquant.</p>";
             }
             exit;
+
+        case 'add_member':
+            if (isset($_POST['group_id'], $_POST['new_member_id'])) {
+                $group_id = htmlspecialchars($_POST['group_id']);
+                $new_member_id = htmlspecialchars($_POST['new_member_id']);
+                $group = $groups->xpath("//group[id='$group_id']")[0];
+                if ($group) {
+                    // Vérifier que l'utilisateur connecté est admin ou coadmin
+                    $is_admin = (string)$group->admin_id === $user_id;
+                    $coadmins = isset($group->coadmins) ? explode(',', (string)$group->coadmins) : [];
+                    $is_coadmin = in_array($user_id, $coadmins);
+                    if ($is_admin || $is_coadmin) {
+                        // Vérifier que le membre n'est pas déjà dans le groupe
+                        $already_member = false;
+                        foreach ($group->member_id as $mid) {
+                            if ((string)$mid === $new_member_id) {
+                                $already_member = true;
+                                break;
+                            }
+                        }
+                        if (!$already_member && (string)$group->admin_id !== $new_member_id) {
+                            $group->addChild('member_id', $new_member_id);
+                            $groups->asXML('xmls/groups.xml');
+                            header('Location: views/view.php?success=member_added');
+                        } else {
+                            header('Location: views/view.php?error=member_already_in_group');
+                        }
+                    } else {
+                        header('Location: views/view.php?error=unauthorized_group_action');
+                    }
+                } else {
+                    header('Location: views/view.php?error=group_not_found');
+                }
+            } else {
+                header('Location: views/view.php?error=missing_group_data');
+            }
+            exit;
     }
 }
 ?>

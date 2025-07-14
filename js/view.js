@@ -364,6 +364,8 @@ function handleGroupActionSelect(select, groupId) {
         document.getElementById('delete-group-modal-' + groupId).style.display = 'flex';
     } else if (value === 'leave_group') {
         document.getElementById('leave-group-modal-' + groupId).style.display = 'flex';
+    } else if (value === 'add_member') {
+        document.getElementById('add-member-modal-' + groupId).style.display = 'flex';
     }
 }
 
