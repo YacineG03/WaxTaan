@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = $_POST['phone'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     
-    if (!$age || $age < 1 || $age > 120) {
-        $error = "L'âge doit être un nombre entre 1 et 120.";
+    if (!$age || $age < 12 || $age > 120) {
+        $error = "L'âge doit être un nombre entre 12 et 120 ans.";
     } else if (!preg_match('/^(77|70|78|76)[0-9]{7}$/', $phone)) {
         $error = "Le numéro de téléphone doit commencer par 77, 70, 78 ou 76 suivi de 7 chiffres.";
     } else {
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <div class="form-group">
                     <label for="age">Âge</label>
-                    <input type="number" id="age" name="age" required min="1" max="120">
+                    <input type="number" id="age" name="age" required min="12" max="120">
                 </div>
                 
                 <div class="form-group">

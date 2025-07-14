@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="groups">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="group" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="id" type="xs:string"/>
+                            <xs:element name="name" type="xs:string"/>
+                            <xs:element name="admin_id" type="xs:string"/>
+                            <xs:element name="coadmins" type="xs:string" minOccurs="0"/>
+                            <xs:element name="group_photo" type="xs:string" minOccurs="0"/>
+                            <xs:element name="member_id" type="xs:string" maxOccurs="unbounded" minOccurs="2"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema> 

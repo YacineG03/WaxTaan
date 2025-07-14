@@ -37,7 +37,30 @@ foreach ($user_contacts as $contact) {
     }
 }
 // Discussions de groupes
-$user_groups = $groups->xpath("//group[member_id='$user_id']");
+$user_groups = [];
+foreach ($groups->group as $group) {
+    // Vérifie si l'utilisateur est admin, coadmin ou membre
+    $is_admin = ((string)$group->admin_id === $user_id);
+    $is_coadmin = false;
+    if (isset($group->coadmin_id)) {
+        foreach ($group->coadmin_id as $coadmin_id) {
+            if ((string)$coadmin_id === $user_id) {
+                $is_coadmin = true;
+                break;
+            }
+        }
+    }
+    $is_member = false;
+    foreach ($group->member_id as $member_id) {
+        if ((string)$member_id === $user_id) {
+            $is_member = true;
+            break;
+        }
+    }
+    if ($is_admin || $is_coadmin || $is_member) {
+        $user_groups[] = $group;
+    }
+}
 foreach ($user_groups as $group) {
     $group_messages = $messages->xpath("//message[recipient_group='{$group->id}']");
     if (!empty($group_messages)) {
@@ -45,7 +68,7 @@ foreach ($user_groups as $group) {
         $discussions[] = [
             'type' => 'group',
             'group' => $group,
-            'unread_count' => 0, // À implémenter pour les groupes
+            'unread_count' => 0, 
             'latest_message' => $latest_message,
             'message_count' => count($group_messages)
         ];

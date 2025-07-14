@@ -142,19 +142,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
 
         case 'send_message':
-            // Envoyer un message
             if (isset($_POST['recipient'], $_POST['message'], $_POST['recipient_type'])) {
                 $message = $messages->addChild('message');
                 $message->addChild('id', uniqid());
                 $message->addChild('sender_id', $user_id);
-                $message->addChild('content', htmlspecialchars($_POST['message']));
-                $message->addAttribute('timestamp', date('Y-m-d H:i:s'));
                 if ($_POST['recipient_type'] === 'contact') {
-                    // Pour les contacts, on stocke le numéro de téléphone du destinataire
                     $message->addChild('recipient', htmlspecialchars($_POST['recipient']));
                 } elseif ($_POST['recipient_type'] === 'group') {
                     $message->addChild('recipient_group', htmlspecialchars($_POST['recipient']));
                 }
+                $message->addChild('content', htmlspecialchars($_POST['message']));
                 if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
                     $upload_dir = 'uploads/';
                     $file_name = uniqid() . '_' . basename($_FILES['file']['name']);
@@ -163,6 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $message->addChild('file', $file_name);
                     }
                 }
+                $message->addChild('read_by', '');
+                $message->addAttribute('timestamp', date('Y-m-d\TH:i:s'));
                 $messages->asXML('xmls/messages.xml');
             }
             header('Location: views/view.php?conversation=' . ($_POST['recipient_type'] === 'group' ? 'group:' : 'contact:') . urlencode($_POST['recipient']));
