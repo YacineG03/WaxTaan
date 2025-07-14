@@ -203,6 +203,16 @@
                     if ($contact_user_id) {
                         // Récupérer les messages entre les deux utilisateurs
                         $messages_to_show = $messages->xpath("//message[(sender_id='$user_id' and recipient='$id') or (sender_id='$contact_user_id' and recipient='$current_user->phone')]");
+                        // Marquer comme lus tous les messages reçus non lus
+                        foreach ($messages->xpath("//message[sender_id='$contact_user_id' and recipient='$current_user->phone']") as $msg) {
+                            if (!isset($msg->read_by) || !in_array($user_id, explode(',', (string)$msg->read_by))) {
+                                $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
+                                $read_by_arr = $read_by ? explode(',', $read_by) : [];
+                                $read_by_arr[] = $user_id;
+                                $msg->read_by = implode(',', array_unique($read_by_arr));
+                            }
+                        }
+                        $messages->asXML('../xmls/messages.xml');
                     } else {
                         $messages_to_show = [];
                     }
@@ -213,6 +223,16 @@
                     $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                 } elseif ($type === 'group') {
                     $messages_to_show = $messages->xpath("//message[recipient_group='$id']");
+                    // Marquer comme lus tous les messages de groupe non lus
+                    foreach ($messages->xpath("//message[recipient_group='$id']") as $msg) {
+                        if (!isset($msg->read_by) || !in_array($user_id, explode(',', (string)$msg->read_by))) {
+                            $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
+                            $read_by_arr = $read_by ? explode(',', $read_by) : [];
+                            $read_by_arr[] = $user_id;
+                            $msg->read_by = implode(',', array_unique($read_by_arr));
+                        }
+                    }
+                    $messages->asXML('../xmls/messages.xml');
                     $group_info_result = $groups->xpath("//group[id='$id']");
                     $group_info = !empty($group_info_result) ? $group_info_result[0] : null;
                     $conversation_name = $group_info ? htmlspecialchars($group_info->name) : 'Groupe';

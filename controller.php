@@ -21,13 +21,16 @@ function getPhoneByUserID($users, $user_id) {
 function getUnreadMessageCount($messages, $current_user_phone, $contact_phone) {
     $contact_user_id = getUserIDByPhone($GLOBALS['users'], $contact_phone);
     if (!$contact_user_id) return 0;
-    
     // Messages reçus de ce contact (envoyés par le contact à l'utilisateur connecté)
     $received_messages = $messages->xpath("//message[sender_id='$contact_user_id' and recipient='$current_user_phone']");
-    
-    // Pour l'instant, on considère tous les messages comme non lus
-    // Plus tard, on pourrait ajouter un attribut "read" aux messages
-    return count($received_messages);
+    $unread = 0;
+    $current_user_id = $GLOBALS['user_id'];
+    foreach ($received_messages as $msg) {
+        if (!isset($msg->read_by) || !in_array($current_user_id, explode(',', (string)$msg->read_by))) {
+            $unread++;
+        }
+    }
+    return $unread;
 }
 
 // Récupérer les discussions (contacts et groupes)
