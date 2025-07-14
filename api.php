@@ -410,10 +410,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         case 'leave_group':
             if (isset($_POST['group_id'])) {
                 $group_id = htmlspecialchars($_POST['group_id']);
-                
                 // Vérifier que le groupe existe
                 $group = $groups->xpath("//group[id='$group_id']")[0];
-                
                 if ($group) {
                     // Vérifier que l'utilisateur est membre du groupe
                     $is_member = false;
@@ -423,34 +421,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             break;
                         }
                     }
-                    
                     if ($is_member) {
-                        // Retirer l'utilisateur du groupe
+                        // Retirer l'utilisateur du groupe (sans créer de <member_id/> vide)
                         $member_ids = [];
                         foreach ($group->member_id as $member_id) {
-                            if ((string)$member_id !== $user_id) {
-                                $member_ids[] = $member_id;
+                            if ((string)$member_id !== $user_id && trim((string)$member_id) !== '') {
+                                $member_ids[] = (string)$member_id;
                             }
                         }
-                        
-                        // Mettre à jour les membres
                         unset($group->member_id);
                         foreach ($member_ids as $member_id) {
                             $group->addChild('member_id', $member_id);
                         }
-                        
                         // Si l'utilisateur était admin, transférer l'admin à un autre membre
                         if ((string)$group->admin_id === $user_id) {
                             if (!empty($member_ids)) {
                                 $group->admin_id = $member_ids[0];
-                                // Supprimer les coadmins si l'admin quitte
+                                unset($group->coadmins);
+                            } else {
+                                // Si plus aucun membre, on peut supprimer le groupe ou laisser l'admin seul (ici on laisse le groupe)
+                            }
+                        }
+                        // Retirer l'utilisateur des coadmins s'il l'était
+                        if (isset($group->coadmins)) {
+                            $coadmin_list = explode(',', (string)$group->coadmins);
+                            $coadmin_list = array_diff($coadmin_list, [$user_id]);
+                            if (!empty($coadmin_list)) {
+                                $group->coadmins = implode(',', $coadmin_list);
+                            } else {
                                 unset($group->coadmins);
                             }
                         }
-                        
-                        // Sauvegarder le fichier
                         $result = $groups->asXML('xmls/groups.xml');
-                        
                         if ($result) {
                             header('Location: views/view.php?success=group_left');
                         } else {
