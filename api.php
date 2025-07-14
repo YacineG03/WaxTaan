@@ -710,6 +710,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 header('Location: views/view.php?error=missing_group_data');
             }
             exit;
+
+        case 'edit_contact':
+            if (isset($_POST['contact_id'], $_POST['contact_name'])) {
+                $contact_id = htmlspecialchars($_POST['contact_id']);
+                $new_name = htmlspecialchars($_POST['contact_name']);
+                // Vérifier que le contact existe
+                $contact = $contacts->xpath("//contact[id='$contact_id']")[0];
+                if ($contact) {
+                    // Vérifier que l'utilisateur connecté est le propriétaire du contact
+                    if ((string)$contact->user_id === $user_id) {
+                        $contact->contact_name = $new_name;
+                        $result = $contacts->asXML('xmls/contacts.xml');
+                        if ($result) {
+                            header('Location: views/view.php?success=contact_edited');
+                        } else {
+                            header('Location: views/view.php?error=edit_failed');
+                        }
+                    } else {
+                        header('Location: views/view.php?error=unauthorized');
+                    }
+                } else {
+                    header('Location: views/view.php?error=contact_not_found');
+                }
+            } else {
+                header('Location: views/view.php?error=missing_contact_data');
+            }
+            exit;
     }
 }
 ?>

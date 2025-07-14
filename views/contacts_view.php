@@ -37,6 +37,36 @@
     </div>
 </div>
 
+<script>
+function showEditContactForm(contactId, contactName) {
+    document.getElementById('editContactId').value = contactId;
+    document.getElementById('editContactName').value = contactName;
+    document.getElementById('editContactForm').style.display = 'block';
+}
+function hideEditContactForm() {
+    document.getElementById('editContactForm').style.display = 'none';
+}
+</script>
+<!-- Formulaire d'édition caché -->
+<div id="editContactForm" style="display: none; margin-bottom: 16px;">
+    <form action="../api.php" method="post" class="modern-form">
+        <input type="hidden" name="action" value="edit_contact">
+        <input type="hidden" name="contact_id" id="editContactId">
+        <div class="form-group">
+            <label class="form-label">Nouveau nom du contact</label>
+            <input type="text" name="contact_name" id="editContactName" class="form-input" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="modern-btn btn-primary">
+                <span>✏️</span> Modifier
+            </button>
+            <button type="button" onclick="hideEditContactForm()" class="modern-btn btn-secondary">
+                <span>❌</span> Annuler
+            </button>
+        </div>
+    </form>
+</div>
+
 <div class="modern-list">
     <?php foreach ($contacts->xpath("//contact[user_id='$user_id']") as $contact) { ?>
         <?php
@@ -58,7 +88,7 @@
                 </div>
                 
                 <div class="item-actions">
-                    <button type="button" onclick="editContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>', '<?php echo htmlspecialchars($contact->contact_phone); ?>')" class="modern-btn btn-secondary btn-small">
+                    <button type="button" onclick="showEditContactForm('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-secondary btn-small">
                         ✏️
                     </button>
                     <button type="button" onclick="confirmDeleteContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-danger btn-small">
