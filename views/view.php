@@ -251,8 +251,11 @@
                             <?php echo strtoupper(substr($group->name, 0, 1)); ?>
                         <?php } ?>
                     </div>
-                    <div class="chat-info">
-                        <h3><?php echo $conversation_name; ?></h3>
+                    <div class="chat-info" style="flex:1;">
+                        <h3 style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                            <?php echo $conversation_name; ?>
+                            <a href="?" class="modern-btn btn-danger btn-small" style="margin-left:16px;">✖</a>
+                        </h3>
                         <div class="chat-status">
                             <?php if ($type === 'group' && $group_info) { ?>
                                 <?php echo count($group_info->member_id); ?> membres
