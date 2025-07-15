@@ -2,6 +2,23 @@
     <h2>Mes Discussions</h2>
     <p style="color: var(--text-muted); margin-bottom: 16px;">Consultez vos conversations avec vos contacts et groupes</p>
 </div>
+<div class="search-bar">
+    <input type="text" id="searchDiscussions" placeholder="Rechercher une discussion...">
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchDiscussions');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            document.querySelectorAll('.discussion-item').forEach(function(item) {
+                const name = item.textContent.toLowerCase();
+                item.style.display = name.includes(filter) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>
 <div class="modern-list">
 <?php
 // Récupérer tous les contacts avec leurs messages

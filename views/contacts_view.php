@@ -67,13 +67,31 @@ function hideEditContactForm() {
     </form>
 </div>
 
+<div class="search-bar">
+    <input type="text" id="searchContacts" placeholder="Rechercher un contact...">
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchContacts');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            document.querySelectorAll('.contact-item').forEach(function(item) {
+                const name = item.textContent.toLowerCase();
+                item.style.display = name.includes(filter) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>
+
 <div class="modern-list">
     <?php foreach ($contacts->xpath("//contact[user_id='$user_id']") as $contact) { ?>
         <?php
         $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
         if ($contact_user) {
         ?>
-            <div class="list-item">
+            <div class="list-item contact-item">
                 <div class="item-avatar">
                     <?php if ($contact_user->profile_photo && $contact_user->profile_photo != 'default.jpg') { ?>
                         <img src="../uploads/<?php echo htmlspecialchars($contact_user->profile_photo); ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">

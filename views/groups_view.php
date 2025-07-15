@@ -48,6 +48,23 @@
         </form>
     </div>
 </div>
+<div class="search-bar">
+    <input type="text" id="searchGroups" placeholder="Rechercher un groupe...">
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchGroups');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            document.querySelectorAll('.group-item').forEach(function(item) {
+                const name = item.textContent.toLowerCase();
+                item.style.display = name.includes(filter) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>
 <div class="modern-list">
 <?php 
 // Afficher tous les groupes où l'utilisateur est membre OU admin
@@ -74,7 +91,7 @@ foreach ($groups->group as $group) {
     $unique_ids = array_unique($all_ids);
     $member_count = count($unique_ids);
 ?>
-<div class="list-item">
+<div class="list-item group-item">
     <div class="item-avatar">
         <?php if ($group->group_photo && $group->group_photo != 'default.jpg') { ?>
             <img src="../uploads/<?php echo htmlspecialchars($group->group_photo); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
