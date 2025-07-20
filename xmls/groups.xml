@@ -1,3 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schema/groups.xsd">
-<group><id>687574af7b751</id><name>Les girls</name><admin_id>6871a82975833</admin_id><group_photo>687574af7b75c_2.png</group_photo><member_id>6871aa2634117</member_id><member_id>6871ae9cd9e8d</member_id></group></groups>
+    <group>
+    <id>687574af7b751</id>
+    <name>Les girls</name>
+    <id_admin>6871a82975833</id_admin>
+    <group_photo>687574af7b75c_2.png</group_photo>
+    <member_id>6871aa2634117</member_id>
+    <member_id>6871ae9cd9e8d</member_id>
+    </group>
+</groups>

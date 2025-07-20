@@ -7,9 +7,9 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="id" type="xs:string"/>
-                            <xs:element name="firstname" type="xs:string"/>
-                            <xs:element name="lastname" type="xs:string"/>
-                            <xs:element name="sex" minOccurs="0">
+                            <xs:element name="prenom" type="xs:string"/>
+                            <xs:element name="nom" type="xs:string"/>
+                            <xs:element name="sexe" minOccurs="0">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:enumeration value="M"/>
@@ -24,14 +24,14 @@
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="phone">
+                            <xs:element name="telephone">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:pattern value="(77|70|78|76)[0-9]{7}"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="password" type="xs:string"/>
+                            <xs:element name="mdp" type="xs:string"/>
                             <xs:element name="profile_photo" type="xs:string" minOccurs="0"/>
                         </xs:sequence>
                     </xs:complexType>

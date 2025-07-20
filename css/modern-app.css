@@ -5,6 +5,7 @@
   --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
   --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --info-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); /* Nouveau pour les badges de groupe */
 
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
@@ -180,6 +181,11 @@
   margin-bottom: 24px;
 }
 
+.profile-section p {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
 .profile-section h2 {
   font-size: 20px;
   font-weight: 600;
@@ -191,7 +197,7 @@
 }
 
 .profile-section h2::before {
-  content: "👤";
+  /* content: "👤"; */
   font-size: 24px;
 }
 
@@ -244,10 +250,13 @@
 }
 
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-actions {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .form-actions {
@@ -307,6 +316,48 @@
   color: var(--text-muted);
   font-style: italic;
   font-size: 12px;
+}
+
+/* Styles pour les groupes */
+.group-membre-checkbox-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.group-membre-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.group-membre-checkbox-label:hover {
+  background: var(--bg-secondary);
+}
+
+/* Badges */
+.badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.badge-success {
+  background: var(--success-gradient);
+  color: white;
+}
+
+.badge-warning {
+  background: var(--warning-gradient);
+  color: white;
 }
 
 /* Styles pour les fichiers dans les messages */
@@ -388,19 +439,19 @@
 .image-modal, .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(30, 30, 30, 0.18); /* fond plus clair */
+    background: rgba(30, 30, 30, 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    backdrop-filter: blur(2px); /* effet de flou */
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
     background: #fff;
     color: #222;
     border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.35); /* ombre plus forte */
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
     padding: 32px 24px;
     min-width: 320px;
     max-width: 90vw;
@@ -417,7 +468,6 @@
     font-weight: 700;
 }
 
-/* Pour éviter que le bouton "Fermer" soit collé */
 .modal-content button.modern-btn {
     margin-top: 18px;
 }
@@ -506,6 +556,15 @@
   font-size: 12px;
 }
 
+.btn-large {
+  padding: 10px 20px;
+  font-size: 16px;
+  min-width: 180px;
+  height: auto;
+  white-space: normal;
+  line-height: 1.4;
+}
+
 /* Listes modernes */
 .modern-list {
   display: flex;
@@ -545,6 +604,13 @@
   flex-shrink: 0;
 }
 
+.item-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .item-content {
   flex: 1;
   min-width: 0;
@@ -555,6 +621,15 @@
   color: var(--text-primary);
   margin-bottom: 4px;
   font-size: 16px;
+}
+
+.item-name .group-badge {
+  background: var(--info-gradient);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
 }
 
 .item-meta {
@@ -605,11 +680,31 @@
   font-size: 18px;
 }
 
+.chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.chat-info {
+  flex: 1;
+}
+
 .chat-info h3 {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.chat-info .chat-close-btn {
+  margin-left: 16px;
+  text-decoration: none;
 }
 
 .chat-status {
@@ -802,6 +897,74 @@
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  animation: fadeInUp 0.3s ease;
+}
+
+.notification-error {
+  background: var(--secondary-gradient);
+  color: white;
+}
+
+.notification-success {
+  background: var(--success-gradient);
+  color: white;
+}
+
+/* Profil */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.profile-info .profile-telephone {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.profile-edit-form {
+  display: none;
+  margin-top: 24px;
+}
+
+.profile-edit-form .form-actions .btn-secondary {
+  margin-left: 8px;
 }
 
 /* Animations */

@@ -14,18 +14,18 @@ Une application de messagerie moderne développée en PHP avec stockage XML.
 ### 🆕 Nouvelles fonctionnalités (Correction du problème de correspondance)
 
 #### 🔧 Fonctions utilitaires ajoutées
-- **`getUserIDByPhone()`** : Correspondance entre numéro de téléphone et ID utilisateur
-- **`getPhoneByUserID()`** : Correspondance entre ID utilisateur et numéro de téléphone
+- **`getUserIDBytelephone()`** : Correspondance entre numéro de télételephone et ID utilisateur
+- **`gettelephoneByUserID()`** : Correspondance entre ID utilisateur et numéro de télételephone
 - **`getUnreadMessageCount()`** : Comptage des messages non lus par contact
 
 #### 💬 Conversation bidirectionnelle
 - **Problème résolu** : Les messages entre contacts s'affichent maintenant correctement
-- **Logique améliorée** : Correspondance automatique téléphone ↔ user_id
+- **Logique améliorée** : Correspondance automatique télételephone ↔ user_id
 - **Messages bidirectionnels** : Affichage des messages envoyés ET reçus
 
 #### 🔔 Indicateurs de nouveaux messages
 - **Badge numérique** : Affichage du nombre de nouveaux messages
-- **Indicateur textuel** : "Nouveaux messages" sous le numéro de téléphone
+- **Indicateur textuel** : "Nouveaux messages" sous le numéro de télételephone
 - **Animation** : Badge avec animation pulse pour attirer l'attention
 - **Mise en forme** : Contacts avec nouveaux messages mis en évidence
 
@@ -65,11 +65,11 @@ Projet_xmll/
 
 ### Problème initial
 Les messages entre contacts ne s'affichaient pas correctement car :
-- Les messages utilisaient le numéro de téléphone comme `recipient`
+- Les messages utilisaient le numéro de télételephone comme `recipient`
 - La logique d'affichage cherchait par `user_id` au lieu de faire la correspondance
 
 ### Solution implémentée
-1. **Fonctions de correspondance** : Création de fonctions utilitaires pour faire le lien téléphone ↔ user_id
+1. **Fonctions de correspondance** : Création de fonctions utilitaires pour faire le lien télételephone ↔ user_id
 2. **Logique d'affichage améliorée** : Utilisation des fonctions de correspondance dans l'affichage des messages
 3. **Indicateurs visuels** : Ajout de badges et indicateurs pour les nouveaux messages
 4. **Interface améliorée** : Suppression de l'onglet "Messages reçus" au profit d'indicateurs intégrés
@@ -107,7 +107,7 @@ Les messages entre contacts ne s'affichaient pas correctement car :
 ## 📱 Utilisation
 
 1. **Inscription/Connexion** : Créer un compte ou se connecter
-2. **Ajouter des contacts** : Ajouter des contacts par numéro de téléphone
+2. **Ajouter des contacts** : Ajouter des contacts par numéro de télételephone
 3. **Créer des groupes** : Créer des groupes avec plusieurs contacts
 4. **Envoyer des messages** : Cliquer sur "Chat" pour discuter
 5. **Voir les nouveaux messages** : Les contacts avec nouveaux messages sont mis en évidence
@@ -123,4 +123,4 @@ Les messages entre contacts ne s'affichaient pas correctement car :
 
 ---
 
-**🎉 Le problème de correspondance entre numéro de téléphone et user_id est maintenant complètement résolu !** 
+**🎉 Le problème de correspondance entre numéro de télételephone et user_id est maintenant complètement résolu !** 

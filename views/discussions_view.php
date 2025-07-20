@@ -1,111 +1,114 @@
+<?php
+// Les fonctions sont déjà définies dans controller.php, pas besoin de les redéclarer ici
+?>
 <div class="profile-section">
     <h2>Mes Discussions</h2>
     <p style="color: var(--text-muted); margin-bottom: 16px;">Consultez vos conversations avec vos contacts et groupes</p>
 </div>
 <div class="search-bar">
-    <input type="text" id="searchDiscussions" placeholder="Rechercher une discussion...">
+    <input type="text" id="rechercheDiscussions" placeholder="Rechercher une discussion...">
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchDiscussions');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase();
-            document.querySelectorAll('.discussion-item').forEach(function(item) {
-                const name = item.textContent.toLowerCase();
-                item.style.display = name.includes(filter) ? '' : 'none';
-            });
-        });
-    }
-});
-</script>
 <div class="modern-list">
 <?php
 // Récupérer tous les contacts avec leurs messages
-$user_contacts = $contacts->xpath("//contact[user_id='$user_id']");
+$contacts_utilisateur = $contacts->xpath("//contact[user_id='$id_utilisateur']");
 $discussions = [];
 // Discussions avec contacts
-foreach ($user_contacts as $contact) {
-    $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
-    if ($contact_user) {
-        $unread_count = getUnreadMessageCount($messages, $current_user->phone, $contact->contact_phone);
-        $contact_user_id = getUserIDByPhone($users, $contact->contact_phone);
-        $conversation_messages = $messages->xpath("//message[(sender_id='$user_id' and recipient='$contact->contact_phone') or (sender_id='$contact_user_id' and recipient='$current_user->phone')]");
-        if (!empty($conversation_messages)) {
-            $latest_message = end($conversation_messages);
+foreach ($contacts_utilisateur as $contact) {
+    $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+    if ($utilisateur_contact) {
+        $nb_non_lus = compterMessagesNonLus($messages, $utilisateur_courant->telephone, $contact->contact_telephone);
+        $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($utilisateurs, $contact->contact_telephone);
+        $messages_conversation = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='$contact->contact_telephone') or (sender_id='$id_utilisateur_contact' and recipient='$utilisateur_courant->telephone')]");
+        if (!empty($messages_conversation)) {
+            // Trier les messages par timestamp (plus récent en dernier)
+            usort($messages_conversation, function($a, $b) {
+                $timestamp_a = (string)$a->timestamp;
+                $timestamp_b = (string)$b->timestamp;
+                return strtotime($timestamp_a) - strtotime($timestamp_b);
+            });
+            $derniers_messages = end($messages_conversation);
             $discussions[] = [
                 'type' => 'contact',
                 'contact' => $contact,
-                'contact_user' => $contact_user,
-                'unread_count' => $unread_count,
-                'latest_message' => $latest_message,
-                'message_count' => count($conversation_messages)
+                'utilisateur_contact' => $utilisateur_contact,
+                'nb_non_lus' => $nb_non_lus,
+                'derniers_messages' => $derniers_messages,
+                'nb_messages' => count($messages_conversation)
             ];
         } else {
             $discussions[] = [
                 'type' => 'contact',
                 'contact' => $contact,
-                'contact_user' => $contact_user,
-                'unread_count' => 0,
-                'latest_message' => null,
-                'message_count' => 0
+                'utilisateur_contact' => $utilisateur_contact,
+                'nb_non_lus' => 0,
+                'derniers_messages' => null,
+                'nb_messages' => 0
             ];
         }
     }
 }
 // Discussions de groupes
-$user_groups = [];
-foreach ($groups->group as $group) {
+$groupes_utilisateur = [];
+foreach ($groupes->group as $groupe) {
     // Vérifie si l'utilisateur est admin, coadmin ou membre
-    $is_admin = ((string)$group->admin_id === $user_id);
-    $is_coadmin = false;
-    if (isset($group->coadmin_id)) {
-        foreach ($group->coadmin_id as $coadmin_id) {
-            if ((string)$coadmin_id === $user_id) {
-                $is_coadmin = true;
+    $est_admin = ((string)$groupe->id_admin === $id_utilisateur);
+    $est_coadmin = false;
+    if (isset($groupe->id_coadmin)) {
+        foreach ($groupe->id_coadmin as $id_coadmin) {
+            if ((string)$id_coadmin === $id_utilisateur) {
+                $est_coadmin = true;
                 break;
             }
         }
     }
-    $is_member = false;
-    foreach ($group->member_id as $member_id) {
-        if ((string)$member_id === $user_id) {
-            $is_member = true;
+    $est_membre = false;
+    foreach ($groupe->member_id as $id_membre) {
+        if ((string)$id_membre === $id_utilisateur) {
+            $est_membre = true;
             break;
         }
     }
-    if ($is_admin || $is_coadmin || $is_member) {
-        $user_groups[] = $group;
+    if ($est_admin || $est_coadmin || $est_membre) {
+        $groupes_utilisateur[] = $groupe;
     }
 }
-foreach ($user_groups as $group) {
-    $group_messages = $messages->xpath("//message[recipient_group='{$group->id}']");
-    if (!empty($group_messages)) {
-        $latest_message = end($group_messages);
+foreach ($groupes_utilisateur as $groupe) {
+    $messages_groupe = $messages->xpath("//message[recipient_group='{$groupe->id}']");
+    if (!empty($messages_groupe)) {
+        // Trier les messages par timestamp (plus récent en dernier)
+        usort($messages_groupe, function($a, $b) {
+            $timestamp_a = (string)$a->timestamp;
+            $timestamp_b = (string)$b->timestamp;
+            return strtotime($timestamp_a) - strtotime($timestamp_b);
+        });
+        $derniers_messages = end($messages_groupe);
         $discussions[] = [
-            'type' => 'group',
-            'group' => $group,
-            'unread_count' => 0, 
-            'latest_message' => $latest_message,
-            'message_count' => count($group_messages)
+            'type' => 'groupe',
+            'groupe' => $groupe,
+            'nb_non_lus' => 0, 
+            'derniers_messages' => $derniers_messages,
+            'nb_messages' => count($messages_groupe)
         ];
     } else {
         $discussions[] = [
-            'type' => 'group',
-            'group' => $group,
-            'unread_count' => 0,
-            'latest_message' => null,
-            'message_count' => 0
+            'type' => 'groupe',
+            'groupe' => $groupe,
+            'nb_non_lus' => 0,
+            'derniers_messages' => null,
+            'nb_messages' => 0
         ];
     }
 }
 // Trier les discussions par date du dernier message (plus récent en premier)
 usort($discussions, function($a, $b) {
-    if ($a['latest_message'] && $b['latest_message']) {
-        return strtotime($b['latest_message']['timestamp']) - strtotime($a['latest_message']['timestamp']);
-    } elseif ($a['latest_message']) {
+    if ($a['derniers_messages'] && $b['derniers_messages']) {
+        $timestamp_a = (string)$a['derniers_messages']->timestamp;
+        $timestamp_b = (string)$b['derniers_messages']->timestamp;
+        return strtotime($timestamp_b) - strtotime($timestamp_a);
+    } elseif ($a['derniers_messages']) {
         return -1;
-    } elseif ($b['latest_message']) {
+    } elseif ($b['derniers_messages']) {
         return 1;
     }
     return 0;
@@ -113,15 +116,15 @@ usort($discussions, function($a, $b) {
 foreach ($discussions as $discussion) {
     if ($discussion['type'] === 'contact') {
         $contact = $discussion['contact'];
-        $contact_user = $discussion['contact_user'];
-        $unread_count = $discussion['unread_count'];
-        $latest_message = $discussion['latest_message'];
-        $message_count = $discussion['message_count'];
+        $utilisateur_contact = $discussion['utilisateur_contact'];
+        $nb_non_lus = $discussion['nb_non_lus'];
+        $derniers_messages = $discussion['derniers_messages'];
+        $nb_messages = $discussion['nb_messages'];
 ?>
     <div class="list-item discussion-item">
         <div class="item-avatar">
-            <?php if ($contact_user->profile_photo && $contact_user->profile_photo != 'default.jpg') { ?>
-                <img src="../uploads/<?php echo htmlspecialchars($contact_user->profile_photo); ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            <?php if ($utilisateur_contact->profile_photo && (string)$utilisateur_contact->profile_photo != 'default.jpg') { ?>
+                <img src="../uploads/<?php echo htmlspecialchars($utilisateur_contact->profile_photo); ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             <?php } else { ?>
                 <?php echo strtoupper(substr($contact->contact_name, 0, 1)); ?>
             <?php } ?>
@@ -129,23 +132,23 @@ foreach ($discussions as $discussion) {
         <div class="item-content">
             <div class="item-name">
                 <?php echo htmlspecialchars($contact->contact_name); ?>
-                <?php if ($unread_count > 0) { ?>
-                    <span class="unread-badge"><?php echo $unread_count; ?></span>
+                <?php if ($nb_non_lus > 0) { ?>
+                    <span class="unread-badge"><?php echo $nb_non_lus; ?></span>
                 <?php } ?>
             </div>
             <div class="item-meta">
-                <?php if ($latest_message) { ?>
+                <?php if ($derniers_messages) { ?>
                     <?php 
-                    $sender = $users->xpath("//user[id='{$latest_message->sender_id}']")[0];
-                    $is_sent_by_me = $latest_message->sender_id == $user_id;
+                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->sender_id}']")[0];
+                    $envoye_par_moi = $derniers_messages->sender_id == $id_utilisateur;
                     ?>
                     <span class="message-preview">
-                        <?php echo $is_sent_by_me ? 'Vous: ' : ''; ?>
-                        <?php echo htmlspecialchars(substr($latest_message->content, 0, 50)); ?>
-                        <?php if (strlen($latest_message->content) > 50) echo '...'; ?>
+                        <?php echo $envoye_par_moi ? 'Vous: ' : ''; ?>
+                        <?php echo htmlspecialchars(substr($derniers_messages->content, 0, 50)); ?>
+                        <?php if (strlen($derniers_messages->content) > 50) echo '...'; ?>
                     </span>
                     <span class="message-time">
-                        <?php echo date('d/m H:i', strtotime($latest_message['timestamp'] ?? 'now')); ?>
+                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->timestamp ?? 'now')); ?>
                     </span>
                 <?php } else { ?>
                     <span class="no-messages">Aucun message</span>
@@ -153,46 +156,46 @@ foreach ($discussions as $discussion) {
             </div>
         </div>
         <div class="item-actions">
-            <a href="?conversation=contact:<?php echo urlencode($contact->contact_phone); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
+            <a href="?conversation=contact:<?php echo urlencode($contact->id); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
                 💬 Ouvrir
             </a>
         </div>
     </div>
-<?php } else { // Type group
-        $group = $discussion['group'];
-        $unread_count = $discussion['unread_count'];
-        $latest_message = $discussion['latest_message'];
-        $message_count = $discussion['message_count'];
+<?php } else { // Type groupe
+        $groupe = $discussion['groupe'];
+        $nb_non_lus = $discussion['nb_non_lus'];
+        $derniers_messages = $discussion['derniers_messages'];
+        $nb_messages = $discussion['nb_messages'];
 ?>
     <div class="list-item discussion-item">
         <div class="item-avatar">
-            <?php if ($group->group_photo && $group->group_photo != 'default.jpg') { ?>
-                <img src="../uploads/<?php echo htmlspecialchars($group->group_photo); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            <?php if ($groupe->group_photo && $groupe->group_photo != 'default.jpg') { ?>
+                <img src="../uploads/<?php echo htmlspecialchars($groupe->group_photo); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             <?php } else { ?>
-                <?php echo strtoupper(substr($group->name, 0, 1)); ?>
+                <?php echo strtoupper(substr($groupe->name, 0, 1)); ?>
             <?php } ?>
         </div>
         <div class="item-content">
             <div class="item-name">
-                <?php echo htmlspecialchars($group->name); ?>
+                <?php echo htmlspecialchars($groupe->name); ?>
                 <span style="background: var(--info-gradient); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">Groupe</span>
-                <?php if ($unread_count > 0) { ?>
-                    <span class="unread-badge"><?php echo $unread_count; ?></span>
+                <?php if ($nb_non_lus > 0) { ?>
+                    <span class="unread-badge"><?php echo $nb_non_lus; ?></span>
                 <?php } ?>
             </div>
             <div class="item-meta">
-                <?php if ($latest_message) { ?>
+                <?php if ($derniers_messages) { ?>
                     <?php 
-                    $sender = $users->xpath("//user[id='{$latest_message->sender_id}']")[0];
-                    $is_sent_by_me = $latest_message->sender_id == $user_id;
+                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->sender_id}']")[0];
+                    $envoye_par_moi = $derniers_messages->sender_id == $id_utilisateur;
                     ?>
                     <span class="message-preview">
-                        <?php echo $is_sent_by_me ? 'Vous: ' : ($sender ? htmlspecialchars($sender->firstname . ': ') : ''); ?>
-                        <?php echo htmlspecialchars(substr($latest_message->content, 0, 50)); ?>
-                        <?php if (strlen($latest_message->content) > 50) echo '...'; ?>
+                        <?php echo $envoye_par_moi ? 'Vous: ' : ($expediteur ? htmlspecialchars($expediteur->prenom . ': ') : ''); ?>
+                        <?php echo htmlspecialchars(substr($derniers_messages->content, 0, 50)); ?>
+                        <?php if (strlen($derniers_messages->content) > 50) echo '...'; ?>
                     </span>
                     <span class="message-time">
-                        <?php echo date('d/m H:i', strtotime($latest_message['timestamp'] ?? 'now')); ?>
+                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->timestamp ?? 'now')); ?>
                     </span>
                 <?php } else { ?>
                     <span class="no-messages">Aucun message</span>
@@ -200,7 +203,7 @@ foreach ($discussions as $discussion) {
             </div>
         </div>
         <div class="item-actions">
-            <a href="?conversation=group:<?php echo urlencode($group->id); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
+            <a href="?conversation=groupe:<?php echo urlencode($groupe->id); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
                 💬 Ouvrir
             </a>
         </div>
@@ -214,4 +217,5 @@ foreach ($discussions as $discussion) {
         <p>Commencez à discuter avec vos contacts ou groupes pour voir vos conversations ici.</p>
     </div>
 <?php } ?>
-</div> 
+</div>
+<script src="../js/global.js"></script> 

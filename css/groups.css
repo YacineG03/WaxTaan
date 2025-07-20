@@ -135,7 +135,7 @@
 }
 
 /* Compteur de membres */
-.member-count {
+.membre-count {
   background: var(--gray-200);
   color: var(--gray-600);
   font-size: 11px;

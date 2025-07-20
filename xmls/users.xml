@@ -1,33 +1,33 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <users xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schema/users.xsd">
     <user>
             <id>6871a82975833</id>
-            <firstname>Yacine</firstname>
-            <lastname>GUEYE</lastname>
-            <sex>M</sex>
+            <prenom>Yacine</prenom>
+            <nom>GUEYE</nom>
+            <sexe>M</sexe>
             <age>20</age>
-            <phone>777777777</phone>
-            <password>$2y$10$b2PmMk70nQjcrQCY0qXopeaA3NqnDuAdWrxE2DMqT4mNnR/e7dfy6</password>
+            <telephone>777777777</telephone>
+            <mdp>$2y$10$b2PmMk70nQjcrQCY0qXopeaA3NqnDuAdWrxE2DMqT4mNnR/e7dfy6</mdp>
             <profile_photo>6875689a5f07c_3.jfif</profile_photo>
         </user>
         <user>
             <id>6871aa2634117</id>
-            <firstname>Assy</firstname>
-            <lastname>NDIAYE</lastname>
-            <sex>F</sex>
+            <prenom>Assy</prenom>
+            <nom>NDIAYE</nom>
+            <sexe>F</sexe>
             <age>18</age>
-            <phone>700000000</phone>
-            <password>$2y$10$kJO8pmP1cftuX1mBi.YHB.j6S5uCqfx5KKWfBjrQUc0PLb.iEL./m</password>
+            <telephone>700000000</telephone>
+            <mdp>$2y$10$kJO8pmP1cftuX1mBi.YHB.j6S5uCqfx5KKWfBjrQUc0PLb.iEL./m</mdp>
             <profile_photo>6871ba7449088_default.png</profile_photo>
         </user>
         <user>
             <id>6871ae9cd9e8d</id>
-            <firstname>Mariama</firstname>
-            <lastname>DIOUM</lastname>
-            <sex>F</sex>
+            <prenom>Mariama</prenom>
+            <nom>DIOUM</nom>
+            <sexe>F</sexe>
             <age>12</age>
-            <phone>788888888</phone>
-            <password>$2y$10$ttWrHIp7uTaKVhvg82SZ.OI2umPls6InQAWGoT5wklePjCpk88OHy</password>
+            <telephone>788888888</telephone>
+            <mdp>$2y$10$ttWrHIp7uTaKVhvg82SZ.OI2umPls6InQAWGoT5wklePjCpk88OHy</mdp>
             <profile_photo>default.jpg</profile_photo>
         </user>
-<user><id>6871d03d2ec35</id><firstname>Fatima</firstname><lastname>GUEYE</lastname><sex>F</sex><age>29</age><phone>766666666</phone><password>$2y$10$H4T99Ci81m.jA5BL2m1Onu0hHGwnj252aGvNkN64gNiPHsiGWwhee</password><profile_photo>default.jpg</profile_photo></user><user><id>68741d7b37f4d</id><firstname>Fatima</firstname><lastname>GUEYE</lastname><sex>F</sex><age>18</age><phone>770123456</phone><password>$2y$10$Tx2TUvyE1yxtjIezako2bewVjsGVZ5TMzn3Z8Ij8EQ41K5wmg0wH6</password><profile_photo>default.jpg</profile_photo></user></users>
+<user><id>6871d03d2ec35</id><prenom>Fatima</prenom><nom>GUEYE</nom><sexe>F</sexe><age>29</age><telephone>766666666</telephone><mdp>$2y$10$H4T99Ci81m.jA5BL2m1Onu0hHGwnj252aGvNkN64gNiPHsiGWwhee</mdp><profile_photo>default.jpg</profile_photo></user><user><id>68741d7b37f4d</id><prenom>Fatima</prenom><nom>GUEYE</nom><sexe>F</sexe><age>18</age><telephone>770123456</telephone><mdp>$2y$10$Tx2TUvyE1yxtjIezako2bewVjsGVZ5TMzn3Z8Ij8EQ41K5wmg0wH6</mdp><profile_photo>default.jpg</profile_photo></user></users>

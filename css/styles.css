@@ -8,20 +8,15 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   min-height: 100vh;
 }
 
 /* Fichier principal qui importe tous les autres CSS */
-@import url('base.css');
-@import url('layout.css');
-@import url('components.css');
-@import url('forms.css');
-@import url('contacts.css');
-@import url('groups.css');
-@import url('chat.css');
-@import url('auth.css');
-@import url('responsive.css');
+/* @import url('layout.css'); */
+/* @import url('contacts.css'); */
+/* @import url('groups.css'); */
+/* @import url('chat.css'); */
 
 /* Container principal */
 .flex.h-screen {

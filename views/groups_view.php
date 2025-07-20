@@ -1,32 +1,34 @@
 <div class="profile-section">
     <div class="section-header">
         <h2>Mes Groupes</h2>
-        <button type="button" onclick="showCreateGroupForm()" class="modern-btn btn-primary">
+    </div>
+    <div class="section-actions">
+        <button type="button" onclick="afficherFormulaireCreationGroupe()" class="modern-btn btn-primary btn-large">
             <span>➕</span>
             Créer un Groupe
         </button>
     </div>
     <!-- Formulaire de création caché -->
-    <div id="createGroupForm" style="display: none;">
+    <div id="formulaireCreationGroupe" style="display: none;">
         <form action="../api.php" method="post" enctype="multipart/form-data" class="modern-form">
-            <input type="hidden" name="action" value="create_group">
+            <input type="hidden" name="action" value="creer_groupe">
             <div class="form-group">
                 <label class="form-label">Nom du groupe</label>
-                <input type="text" name="group_name" class="form-input" placeholder="Nom du groupe" required>
+                <input type="text" name="nom_groupe" class="form-input" placeholder="Nom du groupe" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Photo du groupe</label>
-                <input type="file" name="group_photo" class="form-input" accept="image/*">
+                <input type="file" name="photo_groupe" class="form-input" accept="image/*">
             </div>
             <div class="form-group">
                 <label class="form-label">Sélectionner les membres</label>
                 <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px;">
                     <?php
-                    foreach ($contacts->xpath("//contact[user_id='$user_id']") as $contact) {
-                        $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
-                        if ($contact_user) {
+                    foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) {
+                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+                        if ($utilisateur_contact) {
                             echo "<label style='display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-radius: 6px; transition: background 0.3s ease;' onmouseover='this.style.background=\"var(--bg-secondary)\"' onmouseout='this.style.background=\"transparent\"'>";
-                            echo "<input type='checkbox' name='member_ids[]' value='" . htmlspecialchars($contact_user->id) . "' style='margin: 0;'>";
+                            echo "<input type='checkbox' name='ids_membres[]' value='" . htmlspecialchars($utilisateur_contact->id) . "' style='margin: 0;'>";
                             echo "<span>" . htmlspecialchars($contact->contact_name) . "</span>";
                             echo "</label>";
                         }
@@ -40,7 +42,7 @@
                     <span>🏠</span>
                     Créer le Groupe
                 </button>
-                <button type="button" onclick="hideCreateGroupForm()" class="modern-btn btn-secondary">
+                <button type="button" onclick="cacherFormulaireCreationGroupe()" class="modern-btn btn-secondary">
                     <span>❌</span>
                     Annuler
                 </button>
@@ -49,206 +51,192 @@
     </div>
 </div>
 <div class="search-bar">
-    <input type="text" id="searchGroups" placeholder="Rechercher un groupe...">
+    <input type="text" id="rechercheGroupes" placeholder="Rechercher un groupe...">
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchGroups');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase();
-            document.querySelectorAll('.group-item').forEach(function(item) {
-                const name = item.textContent.toLowerCase();
-                item.style.display = name.includes(filter) ? '' : 'none';
-            });
-        });
-    }
-});
-</script>
 <div class="modern-list">
 <?php 
 // Afficher tous les groupes où l'utilisateur est membre OU admin
-foreach ($groups->group as $group) {
-    $is_member = false;
-    foreach ($group->member_id as $mid) {
-        if (trim((string)$mid) === trim((string)$user_id)) {
-            $is_member = true;
+foreach ($groupes->group as $groupe) {
+    $est_membre = false;
+    foreach ($groupe->member_id as $id_membre) {
+        if (trim((string)$id_membre) === trim((string)$id_utilisateur)) {
+            $est_membre = true;
             break;
         }
     }
-    $is_admin = trim((string)$group->admin_id) === trim((string)$user_id);
-    if (!$is_member && !$is_admin) continue;
-    $coadmins = isset($group->coadmins) ? explode(',', (string)$group->coadmins) : [];
-    $is_coadmin = in_array(trim((string)$user_id), array_map('trim', $coadmins));
-    $can_manage = $is_admin || $is_coadmin;
-    $member_ids = [];
-    foreach ($group->member_id as $mid) {
-        $member_ids[] = trim((string)$mid);
+    $est_admin = trim((string)$groupe->id_admin) === trim((string)$id_utilisateur);
+    if (!$est_membre && !$est_admin) continue;
+    $coadmins = isset($groupe->coadmins) ? explode(',', (string)$groupe->coadmins) : [];
+    $est_coadmin = in_array(trim((string)$id_utilisateur), array_map('trim', $coadmins));
+    $peut_gerer = $est_admin || $est_coadmin;
+    $ids_membres = [];
+    foreach ($groupe->member_id as $id_membre) {
+        $ids_membres[] = trim((string)$id_membre);
     }
-    $admin_id = trim((string)$group->admin_id);
-    $all_ids = $member_ids;
-    $all_ids[] = $admin_id;
-    $unique_ids = array_unique($all_ids);
-    $member_count = count($unique_ids);
+    $id_admin = trim((string)$groupe->id_admin);
+    $tous_les_ids = $ids_membres;
+    $tous_les_ids[] = $id_admin;
+    $ids_uniques = array_unique($tous_les_ids);
+    $nombre_membres = count($ids_uniques);
 ?>
-<div class="list-item group-item">
+<div class="list-item groupe-item">
     <div class="item-avatar">
-        <?php if ($group->group_photo && $group->group_photo != 'default.jpg') { ?>
-            <img src="../uploads/<?php echo htmlspecialchars($group->group_photo); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <?php if ($groupe->group_photo && $groupe->group_photo != 'default.jpg') { ?>
+            <img src="../uploads/<?php echo htmlspecialchars($groupe->group_photo); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
         <?php } else { ?>
-            <?php echo strtoupper(substr($group->name, 0, 1)); ?>
+            <?php echo strtoupper(substr($groupe->name, 0, 1)); ?>
         <?php } ?>
     </div>
     <div class="item-content">
         <div class="item-name">
-            <?php echo htmlspecialchars($group->name); ?>
-            <?php if ($is_admin) { ?>
+            <?php echo htmlspecialchars($groupe->name); ?>
+            <?php if ($est_admin) { ?>
                 <span class="badge badge-success">Admin</span>
-            <?php } elseif ($is_coadmin) { ?>
+            <?php } elseif ($est_coadmin) { ?>
                 <span class="badge badge-warning">Co-Admin</span>
             <?php } ?>
         </div>
-        <div class="item-meta"><?php echo $member_count; ?> membres</div>
+        <div class="item-meta"><?php echo $nombre_membres; ?> membres</div>
     </div>
     <div class="item-actions">
-        <select class="modern-btn btn-secondary btn-small" onchange="handleGroupActionSelect(this, '<?php echo $group->id; ?>')">
+        <select class="modern-btn btn-secondary btn-small" onchange="gererActionGroupeSelect(this, '<?php echo $groupe->id; ?>')">
             <option value="">⚙️ Actions</option>
-            <option value="open_conversation">💬 Ouvrir la conversation</option>
-            <option value="list_members">👥 Lister les membres</option>
-            <?php if ($can_manage) { ?>
-                <option value="manage_coadmins">👑 Gérer les co-admins</option>
-                <option value="remove_member">➖ Retirer un membre</option>
-                <option value="add_member">➕ Ajouter un membre</option>
+            <option value="ouvrir_conversation">💬 Ouvrir la conversation</option>
+            <option value="lister_membres">👥 Lister les membres</option>
+            <?php if ($peut_gerer) { ?>
+                <option value="gerer_coadmins">👑 Gérer les co-admins</option>
+                <option value="retirer_membre">➖ Retirer un membre</option>
+                <option value="ajouter_membre">➕ Ajouter un membre</option>
             <?php } ?>
-            <?php if ($is_admin) { ?>
-                <option value="delete_group">🗑️ Supprimer le groupe</option>
+            <?php if ($est_admin) { ?>
+                <option value="supprimer_groupe">🗑️ Supprimer le groupe</option>
             <?php } else { ?>
-                <option value="leave_group">🚪 Quitter le groupe</option>
+                <option value="quitter_groupe">🚪 Quitter le groupe</option>
             <?php } ?>
         </select>
     </div>
 </div>
 <!-- 🔒 Modals -->
 <!-- Liste des membres -->
-<div id="members-list-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="liste-membres-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Membres du groupe : <?php echo htmlspecialchars($group->name); ?></h3>
+        <h3>Membres du groupe : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <ul>
             <?php
-            foreach ($unique_ids as $member_id) {
-                $member = $users->xpath("//user[id='$member_id']")[0];
-                if ($member) {
-                    $is_admin_member = ($admin_id === $member_id);
-                    $coadmins_member = isset($group->coadmins) ? explode(',', (string)$group->coadmins) : [];
-                    $is_coadmin_member = in_array($member_id, $coadmins_member);
-                    echo "<li><strong>" . htmlspecialchars($member->firstname . ' ' . $member->lastname) . "</strong> ";
-                    echo "<small>(" . htmlspecialchars($member->phone) . ")</small> ";
-                    if ($is_admin_member) echo "<span style='color:green;'>[Admin]</span>";
-                    elseif ($is_coadmin_member) echo "<span style='color:orange;'>[Co-Admin]</span>";
+            foreach ($ids_uniques as $id_membre) {
+                $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
+                if ($membre) {
+                    $est_admin_membre = ($id_admin === $id_membre);
+                    $coadmins_membre = isset($groupe->coadmins) ? explode(',', (string)$groupe->coadmins) : [];
+                    $est_coadmin_membre = in_array($id_membre, $coadmins_membre);
+                    echo "<li><strong>" . htmlspecialchars($membre->prenom . ' ' . $membre->nom) . "</strong> ";
+                    echo "<small>(" . htmlspecialchars($membre->telephone) . ")</small> ";
+                    if ($est_admin_membre) echo "<span style='color:green;'>[Admin]</span>";
+                    elseif ($est_coadmin_membre) echo "<span style='color:orange;'>[Co-Admin]</span>";
                     else echo "<span style='color:gray;'>[Membre]</span>";
                     echo "</li>";
                 }
             }
             ?>
         </ul>
-        <button onclick="document.getElementById('members-list-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
+        <button onclick="document.getElementById('liste-membres-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
     </div>
 </div>
 <!-- Gérer les co-admins -->
-<div id="coadmins-modal-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="coadmins-modal-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Gérer les co-admins : <?php echo htmlspecialchars($group->name); ?></h3>
+        <h3>Gérer les co-admins : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <ul>
-            <?php foreach ($group->member_id as $member_id) {
-                if ($member_id == $group->admin_id) continue;
-                $member = $users->xpath("//user[id='$member_id']")[0];
-                if ($member) {
-                    $is_coadmin_member = isset($group->coadmins) && in_array($member_id, explode(',', (string)$group->coadmins));
-                    echo "<li>" . htmlspecialchars($member->firstname . ' ' . $member->lastname);
-                    if ($is_coadmin_member) {
-                        echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='remove_coadmin'><input type='hidden' name='group_id' value='".htmlspecialchars($group->id)."'><input type='hidden' name='coadmin_id' value='".htmlspecialchars($member_id)."'><button type='submit' class='modern-btn btn-danger btn-small'>Retirer co-admin</button></form>";
+            <?php foreach ($groupe->member_id as $id_membre) {
+                if ($id_membre == $groupe->id_admin) continue;
+                $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
+                if ($membre) {
+                    $est_coadmin_membre = isset($groupe->coadmins) && in_array($id_membre, explode(',', (string)$groupe->coadmins));
+                    echo "<li>" . htmlspecialchars($membre->prenom . ' ' . $membre->nom);
+                    if ($est_coadmin_membre) {
+                        echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='retirer_coadmin'><input type='hidden' name='id_groupe' value='".htmlspecialchars($groupe->id)."'><input type='hidden' name='id_coadmin' value='".htmlspecialchars($id_membre)."'><button type='submit' class='modern-btn btn-danger btn-small'>Retirer co-admin</button></form>";
                     } else {
-                        echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='add_coadmin'><input type='hidden' name='group_id' value='".htmlspecialchars($group->id)."'><input type='hidden' name='coadmin_id' value='".htmlspecialchars($member_id)."'><button type='submit' class='modern-btn btn-primary btn-small'>Ajouter co-admin</button></form>";
+                        echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='ajouter_coadmin'><input type='hidden' name='id_groupe' value='".htmlspecialchars($groupe->id)."'><input type='hidden' name='id_coadmin' value='".htmlspecialchars($id_membre)."'><button type='submit' class='modern-btn btn-primary btn-small'>Ajouter co-admin</button></form>";
                     }
                     echo "</li>";
                 }
             } ?>
         </ul>
-        <button onclick="document.getElementById('coadmins-modal-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
+        <button onclick="document.getElementById('coadmins-modal-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
     </div>
 </div>
 <!-- Retirer un membre -->
-<div id="remove-member-modal-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="retirer-membre-modal-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Retirer un membre du groupe : <?php echo htmlspecialchars($group->name); ?></h3>
+        <h3>Retirer un membre du groupe : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <ul>
-            <?php foreach ($group->member_id as $member_id) {
-                if ($member_id == $group->admin_id || $member_id == $user_id) continue;
-                $member = $users->xpath("//user[id='$member_id']")[0];
-                if ($member) {
-                    echo "<li>" . htmlspecialchars($member->firstname . ' ' . $member->lastname);
-                    echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='remove_member'><input type='hidden' name='group_id' value='".htmlspecialchars($group->id)."'><input type='hidden' name='member_id' value='".htmlspecialchars($member_id)."'><button type='submit' class='modern-btn btn-danger btn-small'>Retirer</button></form>";
+            <?php foreach ($groupe->member_id as $id_membre) {
+                if ($id_membre == $groupe->id_admin || $id_membre == $id_utilisateur) continue;
+                $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
+                if ($membre) {
+                    echo "<li>" . htmlspecialchars($membre->prenom . ' ' . $membre->nom);
+                    echo " <form method='post' action='../api.php' style='display:inline;'><input type='hidden' name='action' value='retirer_membre'><input type='hidden' name='id_groupe' value='".htmlspecialchars($groupe->id)."'><input type='hidden' name='id_membre' value='".htmlspecialchars($id_membre)."'><button type='submit' class='modern-btn btn-danger btn-small'>Retirer</button></form>";
                     echo "</li>";
                 }
             } ?>
         </ul>
-        <button onclick="document.getElementById('remove-member-modal-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
+        <button onclick="document.getElementById('retirer-membre-modal-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Fermer</button>
     </div>
 </div>
 <!-- Supprimer le groupe -->
-<div id="delete-group-modal-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="supprimer-groupe-modal-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Supprimer le groupe "<?php echo htmlspecialchars($group->name); ?>" ?</h3>
+        <h3>Supprimer le groupe "<?php echo htmlspecialchars($groupe->name); ?>" ?</h3>
         <p>Cette action est irréversible.</p>
         <form method="post" action="../api.php">
-            <input type="hidden" name="action" value="delete_group">
-            <input type="hidden" name="group_id" value="<?php echo htmlspecialchars($group->id); ?>">
+            <input type="hidden" name="action" value="supprimer_groupe">
+            <input type="hidden" name="id_groupe" value="<?php echo htmlspecialchars($groupe->id); ?>">
             <button type="submit" class="modern-btn btn-danger">Confirmer la suppression</button>
-            <button type="button" onclick="document.getElementById('delete-group-modal-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
+            <button type="button" onclick="document.getElementById('supprimer-groupe-modal-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
         </form>
     </div>
 </div>
 <!-- Quitter le groupe -->
-<div id="leave-group-modal-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="quitter-groupe-modal-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Quitter le groupe "<?php echo htmlspecialchars($group->name); ?>" ?</h3>
+        <h3>Quitter le groupe "<?php echo htmlspecialchars($groupe->name); ?>" ?</h3>
         <form method="post" action="../api.php">
-            <input type="hidden" name="action" value="leave_group">
-            <input type="hidden" name="group_id" value="<?php echo htmlspecialchars($group->id); ?>">
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <input type="hidden" name="action" value="quitter_groupe">
+            <input type="hidden" name="id_groupe" value="<?php echo htmlspecialchars($groupe->id); ?>">
+            <input type="hidden" name="id_utilisateur" value="<?php echo htmlspecialchars($id_utilisateur); ?>">
             <button type="submit" class="modern-btn btn-danger">Confirmer</button>
-            <button type="button" onclick="document.getElementById('leave-group-modal-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
+            <button type="button" onclick="document.getElementById('quitter-groupe-modal-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
         </form>
     </div>
 </div>
 <!-- Ajouter un membre -->
-<div id="add-member-modal-<?php echo $group->id; ?>" class="image-modal" style="display:none;">
+<div id="ajouter-membre-modal-<?php echo $groupe->id; ?>" class="image-modal" style="display:none;">
     <div class="modal-content">
-        <h3>Ajouter un membre au groupe : <?php echo htmlspecialchars($group->name); ?></h3>
+        <h3>Ajouter un membre au groupe : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <form method="post" action="../api.php">
-            <input type="hidden" name="action" value="add_member">
-            <input type="hidden" name="group_id" value="<?php echo htmlspecialchars($group->id); ?>">
+            <input type="hidden" name="action" value="ajouter_membre">
+            <input type="hidden" name="id_groupe" value="<?php echo htmlspecialchars($groupe->id); ?>">
             <div class="form-group">
-                <label for="new_member_id">Sélectionner un contact à ajouter :</label>
-                <select name="new_member_id" id="new_member_id" required>
+                <label for="id_nouveau_membre">Sélectionner un contact à ajouter :</label>
+                <select name="id_nouveau_membre" id="id_nouveau_membre" required>
                     <option value="">-- Choisir un contact --</option>
                     <?php
-                    foreach ($contacts->xpath("//contact[user_id='$user_id']") as $contact) {
-                        $contact_user = $users->xpath("//user[phone='{$contact->contact_phone}']")[0];
-                        if ($contact_user && !in_array((string)$contact_user->id, $unique_ids)) {
-                            echo "<option value='" . htmlspecialchars($contact_user->id) . "'>" . htmlspecialchars($contact->contact_name) . " (" . htmlspecialchars($contact->contact_phone) . ")</option>";
+                    foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) {
+                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+                        if ($utilisateur_contact && !in_array((string)$utilisateur_contact->id, $ids_uniques)) {
+                            echo "<option value='" . htmlspecialchars($utilisateur_contact->id) . "'>" . htmlspecialchars($contact->contact_name) . " (" . htmlspecialchars($contact->contact_telephone) . ")</option>";
                         }
                     }
                     ?>
                 </select>
             </div>
             <button type="submit" class="modern-btn btn-primary">Ajouter</button>
-            <button type="button" onclick="document.getElementById('add-member-modal-<?php echo $group->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
+            <button type="button" onclick="document.getElementById('ajouter-membre-modal-<?php echo $groupe->id; ?>').style.display='none'" class="modern-btn btn-secondary">Annuler</button>
         </form>
     </div>
 </div>
 <?php } ?>
-<?php if (empty($groups->group)) { ?>
+<?php if (empty($groupes->group)) { ?>
 <div class="empty-state">
     <div class="empty-icon">🏠</div>
     <h3>Aucun groupe</h3>
@@ -256,3 +244,4 @@ foreach ($groups->group as $group) {
 </div>
 <?php } ?>
 </div> 
+<script src="../js/global.js"></script> 
