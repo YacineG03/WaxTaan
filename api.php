@@ -128,11 +128,11 @@ switch ($action) {
                 $nom_fichier = uniqid() . '_' . basename($_FILES['photo_groupe']['name']);
                 $fichier_cible = $upload_dir . $nom_fichier;
                 if (move_uploaded_file($_FILES['photo_groupe']['tmp_name'], $fichier_cible)) {
-                    $groupe->addChild('group_photo', $nom_fichier);
+                    $groupe->addChild('photo_groupe', $nom_fichier);
                 }
             }
             foreach ($_POST['ids_membres'] as $id_membre) {
-                $groupe->addChild('member_id', htmlspecialchars($id_membre));
+                $groupe->addChild('id_membre', htmlspecialchars($id_membre));
             }
             $resultat = $groupes->asXML('xmls/groups.xml');
             
@@ -287,7 +287,7 @@ switch ($action) {
                     if ($est_admin || $est_coadmin) {
                         // Vérifier que le membre existe dans le groupe
                         $membre_existe = false;
-                        foreach ($groupe->member_id as $id_membre_groupe) {
+                        foreach ($groupe->id_membre as $id_membre_groupe) {
                             if ((string)$id_membre_groupe === $id_membre) {
                                 $membre_existe = true;
                                 break;
@@ -297,16 +297,16 @@ switch ($action) {
                         if ($membre_existe) {
                             // Retirer le membre du groupe (version sûre)
                             $new_member_ids = [];
-                            foreach ($groupe->member_id as $id_membre_groupe) {
+                            foreach ($groupe->id_membre as $id_membre_groupe) {
                                 if ((string)$id_membre_groupe !== $id_membre) {
                                     $new_member_ids[] = (string)$id_membre_groupe;
                                 }
                             }
-                            // Supprimer tous les <member_id>
-                            unset($groupe->member_id);
+                            // Supprimer tous les <id_membre>
+                            unset($groupe->id_membre);
                             // Réajouter les membres restants
                             foreach ($new_member_ids as $mid) {
-                                $groupe->addChild('member_id', $mid);
+                                $groupe->addChild('id_membre', $mid);
                             }
                             // Si le membre retiré était admin, transférer l'admin à un autre membre
                             if ((string)$groupe->id_admin === $id_membre) {
@@ -360,7 +360,7 @@ switch ($action) {
                     if ((string)$groupe->id_admin === $id_utilisateur) {
                         // Vérifier que le coadmin est membre du groupe
                         $est_membre = false;
-                        foreach ($groupe->member_id as $id_membre) {
+                        foreach ($groupe->id_membre as $id_membre) {
                             if ((string)$id_membre === $id_coadmin) {
                                 $est_membre = true;
                                 break;
@@ -450,23 +450,23 @@ switch ($action) {
                 if ($groupe) {
                     // Vérifier que l'utilisateur est membre du groupe
                     $est_membre = false;
-                    foreach ($groupe->member_id as $id_membre_groupe) {
+                    foreach ($groupe->id_membre as $id_membre_groupe) {
                         if ((string)$id_membre_groupe === $id_utilisateur) {
                             $est_membre = true;
                             break;
                         }
                     }
                     if ($est_membre) {
-                        // Retirer l'utilisateur du groupe (sans créer de <member_id/> vide)
+                        // Retirer l'utilisateur du groupe (sans créer de <id_membre/> vide)
                         $member_ids = [];
-                        foreach ($groupe->member_id as $id_membre_groupe) {
+                        foreach ($groupe->id_membre as $id_membre_groupe) {
                             if ((string)$id_membre_groupe !== $id_utilisateur && trim((string)$id_membre_groupe) !== '') {
                                 $member_ids[] = (string)$id_membre_groupe;
                             }
                         }
-                        unset($groupe->member_id);
+                        unset($groupe->id_membre);
                         foreach ($member_ids as $id_membre_groupe) {
-                            $groupe->addChild('member_id', $id_membre_groupe);
+                            $groupe->addChild('id_membre', $id_membre_groupe);
                         }
                         // Si l'utilisateur était admin, transférer l'admin à un autre membre
                         if ((string)$groupe->id_admin === $id_utilisateur) {
@@ -514,7 +514,7 @@ switch ($action) {
                 if ($groupe) {
                     // Vérifier que l'utilisateur est membre du groupe
                     $est_membre = false;
-                    foreach ($groupe->member_id as $id_membre_groupe) {
+                    foreach ($groupe->id_membre as $id_membre_groupe) {
                         if ((string)$id_membre_groupe === $id_utilisateur) {
                             $est_membre = true;
                             break;
@@ -526,7 +526,7 @@ switch ($action) {
                         echo "<h4>Membres du groupe : " . htmlspecialchars($groupe->name) . "</h4>";
                         echo "<div style='max-height: 250px; overflow-y: auto;'>";
                         
-                        foreach ($groupe->member_id as $id_membre_groupe) {
+                        foreach ($groupe->id_membre as $id_membre_groupe) {
                             $membre = $utilisateurs->xpath("//user[id='$id_membre_groupe']")[0];
                             if ($membre) {
                                 $est_admin = (string)$groupe->id_admin === $id_membre_groupe;
@@ -585,7 +585,7 @@ switch ($action) {
                             echo "<h4>Gérer les co-admins</h4>";
                             echo "<div style='max-height: 300px; overflow-y: auto;'>";
                             
-                            foreach ($groupe->member_id as $id_membre) {
+                            foreach ($groupe->id_membre as $id_membre) {
                                 if ((string)$id_membre !== $id_utilisateur) { // Ne pas afficher l'admin principal
                                     $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
                                     if ($membre) {
@@ -625,7 +625,7 @@ switch ($action) {
                             echo "<h4>Sélectionner un membre à retirer</h4>";
                             echo "<div style='max-height: 300px; overflow-y: auto;'>";
                             
-                            foreach ($groupe->member_id as $id_membre) {
+                            foreach ($groupe->id_membre as $id_membre) {
                                 if ((string)$id_membre !== $id_utilisateur) { // Ne pas pouvoir se retirer soi-même
                                     $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
                                     if ($membre) {
@@ -661,7 +661,7 @@ switch ($action) {
                             echo "<h4>Gérer les co-admins</h4>";
                             echo "<div style='max-height: 300px; overflow-y: auto;'>";
                             
-                            foreach ($groupe->member_id as $id_membre) {
+                            foreach ($groupe->id_membre as $id_membre) {
                                 if ((string)$id_membre !== $id_utilisateur) { // Ne pas afficher l'admin principal
                                     $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
                                     if ($membre) {
@@ -722,14 +722,14 @@ switch ($action) {
                     if ($est_admin || $est_coadmin) {
                         // Vérifier que le membre n'est pas déjà dans le groupe
                         $already_member = false;
-                        foreach ($groupe->member_id as $id_membre_groupe) {
+                        foreach ($groupe->id_membre as $id_membre_groupe) {
                             if ((string)$id_membre_groupe === $id_nouveau_membre) {
                                 $already_member = true;
                                 break;
                             }
                         }
                         if (!$already_member && (string)$groupe->id_admin !== $id_nouveau_membre) {
-                            $groupe->addChild('member_id', $id_nouveau_membre);
+                            $groupe->addChild('id_membre', $id_nouveau_membre);
                             $groupes->asXML('xmls/groups.xml');
                             header('Location: views/view.php?success=member_added');
                         } else {
@@ -867,7 +867,7 @@ switch ($action) {
                     }
                 }
                 $est_membre = false;
-                foreach ($groupe->member_id as $id_membre) {
+                foreach ($groupe->id_membre as $id_membre) {
                     if ((string)$id_membre === $id_utilisateur) {
                         $est_membre = true;
                         break;
@@ -880,7 +880,7 @@ switch ($action) {
                         $groupes_sans_messages[] = [
                             'id' => $groupe->id,
                             'nom' => $groupe->name,
-                            'photo' => $groupe->group_photo
+                            'photo' => $groupe->photo_groupe
                         ];
                     }
                 }

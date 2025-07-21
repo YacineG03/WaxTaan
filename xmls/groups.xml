@@ -4,8 +4,9 @@
     <id>687574af7b751</id>
     <name>Les girls</name>
     <id_admin>6871a82975833</id_admin>
-    <group_photo>687574af7b75c_2.png</group_photo>
-    <member_id>6871aa2634117</member_id>
-    <member_id>6871ae9cd9e8d</member_id>
+    <photo_groupe>687574af7b75c_2.png</photo_groupe>
+    <id_membre>6871aa2634117</id_membre>
+    <id_membre>6871ae9cd9e8d</id_membre>
+    <coadmins>6871aa2634117</coadmins>
     </group>
 </groups>

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($utilisateur_existe) {
             $erreur = "Ce numéro est déjà utilisé.";
         } else {
-            $nouvel_utilisateur = $utilisateurs->addChild('user');
+            $nouvel_utilisateur = $utilisateurs->addChild('user'); // <user> </user>
             $nouvel_utilisateur->addChild('id', uniqid());
             $nouvel_utilisateur->addChild('prenom', $prenom);
             $nouvel_utilisateur->addChild('nom', $nom);

@@ -58,7 +58,7 @@
 // Afficher tous les groupes où l'utilisateur est membre OU admin
 foreach ($groupes->group as $groupe) {
     $est_membre = false;
-    foreach ($groupe->member_id as $id_membre) {
+    foreach ($groupe->id_membre as $id_membre) {
         if (trim((string)$id_membre) === trim((string)$id_utilisateur)) {
             $est_membre = true;
             break;
@@ -70,7 +70,7 @@ foreach ($groupes->group as $groupe) {
     $est_coadmin = in_array(trim((string)$id_utilisateur), array_map('trim', $coadmins));
     $peut_gerer = $est_admin || $est_coadmin;
     $ids_membres = [];
-    foreach ($groupe->member_id as $id_membre) {
+    foreach ($groupe->id_membre as $id_membre) {
         $ids_membres[] = trim((string)$id_membre);
     }
     $id_admin = trim((string)$groupe->id_admin);
@@ -81,8 +81,8 @@ foreach ($groupes->group as $groupe) {
 ?>
 <div class="list-item groupe-item">
     <div class="item-avatar">
-        <?php if ($groupe->group_photo && $groupe->group_photo != 'default.jpg') { ?>
-            <img src="../uploads/<?php echo htmlspecialchars($groupe->group_photo); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <?php if ($groupe->photo_groupe && $groupe->photo_groupe != 'default.jpg') { ?>
+            <img src="../uploads/<?php echo htmlspecialchars($groupe->photo_groupe); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
         <?php } else { ?>
             <?php echo strtoupper(substr($groupe->name, 0, 1)); ?>
         <?php } ?>
@@ -147,7 +147,7 @@ foreach ($groupes->group as $groupe) {
     <div class="modal-content">
         <h3>Gérer les co-admins : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <ul>
-            <?php foreach ($groupe->member_id as $id_membre) {
+            <?php foreach ($groupe->id_membre as $id_membre) {
                 if ($id_membre == $groupe->id_admin) continue;
                 $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
                 if ($membre) {
@@ -170,7 +170,7 @@ foreach ($groupes->group as $groupe) {
     <div class="modal-content">
         <h3>Retirer un membre du groupe : <?php echo htmlspecialchars($groupe->name); ?></h3>
         <ul>
-            <?php foreach ($groupe->member_id as $id_membre) {
+            <?php foreach ($groupe->id_membre as $id_membre) {
                 if ($id_membre == $groupe->id_admin || $id_membre == $id_utilisateur) continue;
                 $membre = $utilisateurs->xpath("//user[id='$id_membre']")[0];
                 if ($membre) {

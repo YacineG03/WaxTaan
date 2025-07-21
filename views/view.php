@@ -224,33 +224,52 @@
                     // Récupérer les informations du contact par son ID
                     $contact_info_result = $contacts->xpath("//contact[id='$id']");
                     $contact_info = !empty($contact_info_result) ? $contact_info_result[0] : null;
-                    
+
                     if ($contact_info) {
-                        // Récupérer l'ID de l'utilisateur contact par son numéro de téléphone
+                        // Cas contact connu
                         $contact_user_id = obtenirIdUtilisateurParTelephone($utilisateurs, $contact_info->contact_telephone);
-                    
-                    if ($contact_user_id) {
-                        // Récupérer les messages entre les deux utilisateurs
+                        if ($contact_user_id) {
                             $messages_to_show = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='{$contact_info->contact_telephone}') or (sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone')]");
-                        // Marquer comme lus tous les messages reçus non lus
                             foreach ($messages->xpath("//message[sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone']") as $msg) {
                                 if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
-                                $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
-                                $read_by_arr = $read_by ? explode(',', $read_by) : [];
+                                    $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
+                                    $read_by_arr = $read_by ? explode(',', $read_by) : [];
                                     $read_by_arr[] = $id_utilisateur;
-                                $msg->read_by = implode(',', array_unique($read_by_arr));
+                                    $msg->read_by = implode(',', array_unique($read_by_arr));
+                                }
                             }
-                        }
-                        $messages->asXML('../xmls/messages.xml');
+                            $messages->asXML('../xmls/messages.xml');
                         } else {
                             $messages_to_show = [];
                         }
+                        $conversation_name = htmlspecialchars($contact_info->contact_name);
+                        $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                     } else {
-                        $messages_to_show = [];
+                        // Cas d'un contact inconnu (pas dans la liste des contacts)
+                        $utilisateur_inconnu_result = $utilisateurs->xpath("//user[id='$id']");
+                        $utilisateur_inconnu = !empty($utilisateur_inconnu_result) ? $utilisateur_inconnu_result[0] : null;
+                        if ($utilisateur_inconnu) {
+                            $telephone_inconnu = (string)$utilisateur_inconnu->telephone;
+                            // Récupérer les messages entre l'utilisateur courant et l'inconnu
+                            $messages_to_show = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='$telephone_inconnu') or (sender_id='$id' and recipient='$utilisateur_courant->telephone')]");
+                            // Marquer comme lus tous les messages reçus non lus
+                            foreach ($messages->xpath("//message[sender_id='$id' and recipient='$utilisateur_courant->telephone']") as $msg) {
+                                if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
+                                    $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
+                                    $read_by_arr = $read_by ? explode(',', $read_by) : [];
+                                    $read_by_arr[] = $id_utilisateur;
+                                    $msg->read_by = implode(',', array_unique($read_by_arr));
+                                }
+                            }
+                            $messages->asXML('../xmls/messages.xml');
+                            $conversation_name = htmlspecialchars($telephone_inconnu);
+                            $conversation_avatar = strtoupper(substr($telephone_inconnu, 0, 1));
+                        } else {
+                            $messages_to_show = [];
+                            $conversation_name = 'Inconnu';
+                            $conversation_avatar = '?';
+                        }
                     }
-                    
-                    $conversation_name = $contact_info ? htmlspecialchars($contact_info->contact_name) : 'Contact';
-                    $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                 } elseif (trim($type) === 'groupe') {
                     $messages_to_show = $messages->xpath("//message[recipient_group='$id']");
                     // Marquer comme lus tous les messages de groupe non lus
@@ -275,8 +294,8 @@
                 <!-- Header du chat -->
                 <div class="chat-header">
                     <div class="chat-avatar">
-                        <?php if ($type === 'groupe' && $group_info && $group_info->group_photo && $group_info->group_photo != 'default.jpg') { ?>
-                            <img src="../uploads/<?php echo htmlspecialchars($group_info->group_photo); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <?php if ($type === 'groupe' && $group_info && $group_info->photo_groupe && $group_info->photo_groupe != 'default.jpg') { ?>
+                            <img src="../uploads/<?php echo htmlspecialchars($group_info->photo_groupe); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         <?php } elseif ($type === 'contact' && $contact_info) { 
                             // Récupérer l'utilisateur contact pour sa photo de profil
                             $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact_info->contact_telephone}']")[0];
@@ -298,8 +317,8 @@
                             <?php if ($type === 'groupe' && $group_info) { ?>
                                 <?php 
                                 $nb_membres = 0;
-                                if (isset($group_info->member_id)) {
-                                    $nb_membres = count($group_info->member_id);
+                                if (isset($group_info->id_membre)) {
+                                    $nb_membres = count($group_info->id_membre);
                                 }
                                 echo $nb_membres; 
                                 ?> membres
@@ -323,8 +342,18 @@
                             <div class="message-bubble <?php echo $message->sender_id == $id_utilisateur ? 'sent' : 'received'; ?>">
                                 <?php if ($message->sender_id != $id_utilisateur) { ?>
                                     <div class="message-meta">
-                                        <?php $sender = $utilisateurs->xpath("//user[id='{$message->sender_id}']")[0]; ?>
-                                        <span class="message-sender"><?php echo htmlspecialchars($sender->prenom . ' ' . $sender->nom); ?></span>
+                                        <?php
+                                        $sender = $utilisateurs->xpath("//user[id='{$message->sender_id}']")[0];
+                                        $sender_tel = (string)$sender->telephone;
+                                        $contact_sender = $contacts->xpath("//contact[user_id='$id_utilisateur' and contact_telephone='$sender_tel']");
+                                        if (!empty($contact_sender)) {
+                                            // Afficher le nom du contact
+                                            echo '<span class="message-sender">' . htmlspecialchars($contact_sender[0]->contact_name) . '</span>';
+                                        } else {
+                                            // Sinon, afficher nom/prénom du user
+                                            echo '<span class="message-sender">' . htmlspecialchars($sender->prenom . ' ' . $sender->nom) . '</span>';
+                                        }
+                                        ?>
                                         <span class="message-time"><?php echo date('H:i', strtotime($message['timestamp'] ?? 'now')); ?></span>
                                     </div>
                                 <?php } ?>

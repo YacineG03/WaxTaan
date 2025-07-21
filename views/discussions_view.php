@@ -45,7 +45,6 @@ foreach ($contacts_utilisateur as $contact) {
                 'nb_messages' => count($messages_conversation)
             ];
         }
-        // Ne pas ajouter les contacts sans messages - ils apparaîtront dans le modal "Nouvelle Discussion"
     }
 }
 // Discussions de groupes
@@ -63,7 +62,7 @@ foreach ($groupes->group as $groupe) {
         }
     }
     $est_membre = false;
-    foreach ($groupe->member_id as $id_membre) {
+    foreach ($groupe->id_membre as $id_membre) {
         if ((string)$id_membre === $id_utilisateur) {
             $est_membre = true;
             break;
@@ -91,7 +90,51 @@ foreach ($groupes_utilisateur as $groupe) {
             'nb_messages' => count($messages_groupe)
         ];
     }
-    // Ne pas ajouter les groupes sans messages - ils apparaîtront dans le modal "Nouvelle Discussion"
+}
+// Discussions avec des inconnus (expéditeurs non enregistrés comme contact)
+$messages_recus = $messages->xpath("//message[recipient='$utilisateur_courant->telephone']");
+$expediteurs_inconnus = [];
+foreach ($messages_recus as $msg) {
+    $id_expediteur = (string)$msg->sender_id;
+    // Vérifier si ce sender_id est déjà dans les contacts
+    $utilisateur_expediteur = $utilisateurs->xpath("//user[id='$id_expediteur']");
+    if ($utilisateur_expediteur) {
+        $telephone_expediteur = (string)$utilisateur_expediteur[0]->telephone;
+        $contact_existe = $contacts->xpath("//contact[user_id='$id_utilisateur' and contact_telephone='$telephone_expediteur']");
+        if (!$contact_existe && $id_expediteur != $id_utilisateur) {
+            // On n'a pas encore ajouté ce numéro comme contact
+            $expediteurs_inconnus[$id_expediteur] = $msg;
+        }
+    }
+}
+// Pour chaque expéditeur inconnu, créer une discussion
+foreach ($expediteurs_inconnus as $id_expediteur => $dernier_msg) {
+    $utilisateur_expediteur = $utilisateurs->xpath("//user[id='$id_expediteur']")[0];
+    $telephone_expediteur = (string)$utilisateur_expediteur->telephone;
+    // Récupérer tous les messages de cette personne
+    $messages_conversation = $messages->xpath("//message[(sender_id='$id_expediteur' and recipient='$utilisateur_courant->telephone') or (sender_id='$id_utilisateur' and recipient='$telephone_expediteur')]");
+    // Trier par date
+    usort($messages_conversation, function($a, $b) {
+        $timestamp_a = (string)$a->timestamp;
+        $timestamp_b = (string)$b->timestamp;
+        return strtotime($timestamp_a) - strtotime($timestamp_b);
+    });
+    $dernier_message = end($messages_conversation);
+    // Compter les non lus
+    $nb_non_lus = 0;
+    foreach ($messages_conversation as $msg) {
+        if ($msg->sender_id == $id_expediteur && (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by)))) {
+            $nb_non_lus++;
+        }
+    }
+    $discussions[] = [
+        'type' => 'inconnu',
+        'utilisateur_expediteur' => $utilisateur_expediteur,
+        'telephone_expediteur' => $telephone_expediteur,
+        'nb_non_lus' => $nb_non_lus,
+        'derniers_messages' => $dernier_message,
+        'nb_messages' => count($messages_conversation)
+    ];
 }
 // Trier les discussions par date du dernier message (plus récent en premier)
 usort($discussions, function($a, $b) {
@@ -107,7 +150,48 @@ usort($discussions, function($a, $b) {
     return 0;
 });
 foreach ($discussions as $discussion) {
-    if ($discussion['type'] === 'contact') {
+    if ($discussion['type'] === 'inconnu') {
+        $utilisateur_expediteur = $discussion['utilisateur_expediteur'];
+        $telephone_expediteur = $discussion['telephone_expediteur'];
+        $nb_non_lus = $discussion['nb_non_lus'];
+        $dernier_message = $discussion['derniers_messages'];
+        $nb_messages = $discussion['nb_messages'];
+        ?>
+        <div class="list-item discussion-item">
+            <div class="item-avatar">
+                <?php echo strtoupper(substr($telephone_expediteur, 0, 1)); ?>
+            </div>
+            <div class="item-content">
+                <div class="item-name">
+                    <?php echo htmlspecialchars($telephone_expediteur); ?>
+                    <span style="background: var(--warning-gradient); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">Inconnu</span>
+                    <?php if ($nb_non_lus > 0) { ?>
+                        <span class="unread-badge"><?php echo $nb_non_lus; ?></span>
+                    <?php } ?>
+                </div>
+                <div class="item-meta">
+                    <?php if ($dernier_message) { ?>
+                        <span class="message-preview">
+                            <?php echo $dernier_message->sender_id == $id_utilisateur ? 'Vous: ' : ''; ?>
+                            <?php echo htmlspecialchars(substr($dernier_message->content, 0, 50)); ?>
+                            <?php if (strlen($dernier_message->content) > 50) echo '...'; ?>
+                        </span>
+                        <span class="message-time">
+                            <?php echo date('d/m H:i', strtotime((string)$dernier_message->timestamp ?? 'now')); ?>
+                        </span>
+                    <?php } else { ?>
+                        <span class="no-messages">Aucun message</span>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="item-actions">
+                <a href="?conversation=contact:<?php echo urlencode($utilisateur_expediteur->id); ?>&tab=discussions" class="modern-btn btn-primary btn-small">
+                    💬 Ouvrir
+                </a>
+            </div>
+        </div>
+        <?php
+    } else if ($discussion['type'] === 'contact') {
         $contact = $discussion['contact'];
         $utilisateur_contact = $discussion['utilisateur_contact'];
         $nb_non_lus = $discussion['nb_non_lus'];
@@ -154,7 +238,7 @@ foreach ($discussions as $discussion) {
             </a>
         </div>
     </div>
-<?php } else { // Type groupe
+<?php } else if ($discussion['type'] === 'groupe') {
         $groupe = $discussion['groupe'];
         $nb_non_lus = $discussion['nb_non_lus'];
         $derniers_messages = $discussion['derniers_messages'];
@@ -162,8 +246,8 @@ foreach ($discussions as $discussion) {
 ?>
     <div class="list-item discussion-item">
         <div class="item-avatar">
-            <?php if ($groupe->group_photo && $groupe->group_photo != 'default.jpg') { ?>
-                <img src="../uploads/<?php echo htmlspecialchars($groupe->group_photo); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            <?php if ($groupe->photo_groupe && $groupe->photo_groupe != 'default.jpg') { ?>
+                <img src="../uploads/<?php echo htmlspecialchars($groupe->photo_groupe); ?>" alt="Photo Groupe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             <?php } else { ?>
                 <?php echo strtoupper(substr($groupe->name, 0, 1)); ?>
             <?php } ?>
@@ -201,8 +285,9 @@ foreach ($discussions as $discussion) {
             </a>
         </div>
     </div>
-<?php } ?>
-<?php } ?>
+<?php }
+}
+?>
 <?php if (empty($discussions)) { ?>
     <div class="empty-state">
         <div class="empty-icon">💬</div>

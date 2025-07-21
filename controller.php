@@ -46,7 +46,7 @@ if ($utilisateur_courant) {
             'nb_non_lus' => $nb_non_lus
         ];
     }
-    foreach ($groupes->xpath("//group[member_id='$id_utilisateur']") as $groupe) {
+    foreach ($groupes->xpath("//group[id_membre='$id_utilisateur']") as $groupe) {
         $conversations[] = [
             'type' => 'groupe', 
             'id' => (string)$groupe->id, 
