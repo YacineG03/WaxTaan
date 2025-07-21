@@ -60,9 +60,9 @@
     </form>
 </div>
 
-<div class="search-bar">
+  <div class="search-bar">
     <input type="text" id="rechercheContacts" placeholder="Rechercher un contact...">
-</div>
+  </div>
 
 <div class="modern-list">
     <?php foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) { ?>

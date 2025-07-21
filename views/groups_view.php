@@ -50,9 +50,9 @@
         </form>
     </div>
 </div>
-<div class="search-bar">
+  <div class="search-bar">
     <input type="text" id="rechercheGroupes" placeholder="Rechercher un groupe...">
-</div>
+  </div>
 <div class="modern-list">
 <?php 
 // Afficher tous les groupes où l'utilisateur est membre OU admin

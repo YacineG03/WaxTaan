@@ -6,7 +6,7 @@
     <p style="color: var(--text-muted); margin-bottom: 16px;">Consultez vos conversations avec vos contacts et groupes</p>
 </div>
 <div class="search-bar">
-    <input type="text" id="rechercheDiscussions" placeholder="Rechercher une discussion...">
+    <input type="text" id="rechercheDiscussions" placeholder="Rechercher une discussion..." class="form-input">
 </div>
 <div class="modern-list">
 <?php

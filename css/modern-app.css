@@ -259,6 +259,42 @@
   justify-content: flex-start;
 }
 
+.search-bar {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-bar::before {
+  content: "🔍";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #666;
+  z-index: 1;
+}
+
+.search-bar input {
+  padding-left: 40px;
+  padding-right: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-radius: 25px;
+  border: 1px solid #e0e0e0;
+  width: 80%;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
 .form-actions {
   display: flex;
   gap: 12px;
