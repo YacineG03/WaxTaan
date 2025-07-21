@@ -228,20 +228,20 @@
                     if ($contact_info) {
                         // Récupérer l'ID de l'utilisateur contact par son numéro de téléphone
                         $contact_user_id = obtenirIdUtilisateurParTelephone($utilisateurs, $contact_info->contact_telephone);
-                        
-                        if ($contact_user_id) {
-                            // Récupérer les messages entre les deux utilisateurs
+                    
+                    if ($contact_user_id) {
+                        // Récupérer les messages entre les deux utilisateurs
                             $messages_to_show = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='{$contact_info->contact_telephone}') or (sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone')]");
-                            // Marquer comme lus tous les messages reçus non lus
+                        // Marquer comme lus tous les messages reçus non lus
                             foreach ($messages->xpath("//message[sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone']") as $msg) {
                                 if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
-                                    $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
-                                    $read_by_arr = $read_by ? explode(',', $read_by) : [];
+                                $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
+                                $read_by_arr = $read_by ? explode(',', $read_by) : [];
                                     $read_by_arr[] = $id_utilisateur;
-                                    $msg->read_by = implode(',', array_unique($read_by_arr));
-                                }
+                                $msg->read_by = implode(',', array_unique($read_by_arr));
                             }
-                            $messages->asXML('../xmls/messages.xml');
+                        }
+                        $messages->asXML('../xmls/messages.xml');
                         } else {
                             $messages_to_show = [];
                         }

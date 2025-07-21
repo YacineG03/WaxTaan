@@ -2,7 +2,15 @@
 // Les fonctions sont déjà définies dans controller.php, pas besoin de les redéclarer ici
 ?>
 <div class="profile-section">
-    <h2>Mes Discussions</h2>
+    <div class="section-header">
+        <h2>Mes Discussions</h2>
+    </div>
+    <div class="section-actions">
+        <button type="button" onclick="afficherModalNouvelleDiscussion()" class="modern-btn btn-primary btn-large">
+            <span>➕</span>
+            Nouvelle Discussion
+        </button>
+    </div>
     <p style="color: var(--text-muted); margin-bottom: 16px;">Consultez vos conversations avec vos contacts et groupes</p>
 </div>
 <div class="search-bar">
@@ -36,16 +44,8 @@ foreach ($contacts_utilisateur as $contact) {
                 'derniers_messages' => $derniers_messages,
                 'nb_messages' => count($messages_conversation)
             ];
-        } else {
-            $discussions[] = [
-                'type' => 'contact',
-                'contact' => $contact,
-                'utilisateur_contact' => $utilisateur_contact,
-                'nb_non_lus' => 0,
-                'derniers_messages' => null,
-                'nb_messages' => 0
-            ];
         }
+        // Ne pas ajouter les contacts sans messages - ils apparaîtront dans le modal "Nouvelle Discussion"
     }
 }
 // Discussions de groupes
@@ -90,15 +90,8 @@ foreach ($groupes_utilisateur as $groupe) {
             'derniers_messages' => $derniers_messages,
             'nb_messages' => count($messages_groupe)
         ];
-    } else {
-        $discussions[] = [
-            'type' => 'groupe',
-            'groupe' => $groupe,
-            'nb_non_lus' => 0,
-            'derniers_messages' => null,
-            'nb_messages' => 0
-        ];
     }
+    // Ne pas ajouter les groupes sans messages - ils apparaîtront dans le modal "Nouvelle Discussion"
 }
 // Trier les discussions par date du dernier message (plus récent en premier)
 usort($discussions, function($a, $b) {
@@ -218,4 +211,23 @@ foreach ($discussions as $discussion) {
     </div>
 <?php } ?>
 </div>
+
+<!-- Modal Nouvelle Discussion -->
+<div id="modalNouvelleDiscussion" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Nouvelle Discussion</h3>
+            <button type="button" class="modal-close" onclick="fermerModalNouvelleDiscussion()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="search-bar">
+                <input type="text" id="rechercheNouvelleDiscussion" placeholder="Rechercher un contact ou groupe...">
+            </div>
+            <div class="nouvelle-discussion-list">
+                <!-- Les contacts et groupes sans messages seront chargés ici -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="../js/global.js"></script> 

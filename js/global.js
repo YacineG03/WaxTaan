@@ -568,3 +568,58 @@ function nettoyerUrl() {
 document.addEventListener('DOMContentLoaded', function() {
     nettoyerUrl();
 });
+
+// ========================================
+// FONCTIONS POUR NOUVELLE DISCUSSION
+// ========================================
+
+// Fonctions pour le modal Nouvelle Discussion
+function afficherModalNouvelleDiscussion() {
+    const modal = document.getElementById('modalNouvelleDiscussion');
+    if (modal) {
+        modal.style.display = 'flex';
+        chargerContactsEtGroupesSansMessages();
+        
+        // Fermer le modal en cliquant à l'extérieur
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                fermerModalNouvelleDiscussion();
+            }
+        });
+    }
+}
+
+function fermerModalNouvelleDiscussion() {
+    const modal = document.getElementById('modalNouvelleDiscussion');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function chargerContactsEtGroupesSansMessages() {
+    const liste = document.querySelector('.nouvelle-discussion-list');
+    if (!liste) return;
+
+    // Afficher un indicateur de chargement
+    liste.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Chargement...</p>';
+
+    // Charger les données via AJAX
+    fetch('../api_test.php?action=charger_nouvelle_discussion')
+        .then(response => response.text())
+        .then(html => {
+            liste.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement:', error);
+            liste.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Erreur lors du chargement</p>';
+        });
+}
+
+function demarrerDiscussion(type, id) {
+    // Fermer le modal
+    fermerModalNouvelleDiscussion();
+    
+    // Rediriger vers la conversation
+    const url = `view.php?conversation=${type}:${id}&tab=discussions`;
+    window.location.href = url;
+}
