@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     <div class="form-group">
                         <label for="mdp">Mot de passe</label>
-                        <input type="mdp" id="mdp" name="mdp" required>
+                        <input type="password" id="mdp" name="mdp" required>
                     </div>
                     
                     <div class="form-group">
