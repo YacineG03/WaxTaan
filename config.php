@@ -1,8 +1,13 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['id_utilisateur'])) {
+// Gestion robuste de la session pour AJAX
+if (!isset($_SESSION['id_utilisateur']) || empty($_SESSION['id_utilisateur'])) {
+    if (isset($_GET['action']) && in_array($_GET['action'], ['lister_membres', 'obtenir_membres_groupe'])) {
+        http_response_code(401);
+        echo "<p style='color:red;'>Session expirée ou utilisateur non connecté.</p>";
+        exit;
+    }
     header('Location: connexion/login.php');
     exit;
 }
@@ -26,15 +31,9 @@ if ($groupes === false) {
     die('Erreur : Impossible de charger groups.xml. Vérifiez le fichier ou le chemin.');
 }
 
-
-
 $messages = @simplexml_load_file($cheminBase . 'messages.xml');
 if ($messages === false) {
     die('Erreur : Impossible de charger messages.xml. Vérifiez le fichier ou le chemin.');
 }
 
-// var_dump($utilisateurs);
-// var_dump($contacts);
-// var_dump($groupes);
-// var_dump($messages);
 ?>
