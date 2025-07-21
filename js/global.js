@@ -604,7 +604,7 @@ function chargerContactsEtGroupesSansMessages() {
     liste.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Chargement...</p>';
 
     // Charger les données via AJAX
-    fetch('../api_test.php?action=charger_nouvelle_discussion')
+    fetch('/Projet_xmll/api.php?action=charger_nouvelle_discussion')
         .then(response => response.text())
         .then(html => {
             liste.innerHTML = html;

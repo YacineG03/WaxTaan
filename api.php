@@ -5,6 +5,12 @@ require_once 'config.php';
 $id_utilisateur = $_SESSION['id_utilisateur'];
 $utilisateur_courant = $utilisateurs->xpath("//user[id='$id_utilisateur']")[0];
 
+// Fonction utilitaire pour obtenir l'ID utilisateur à partir du téléphone
+function obtenirIdUtilisateurParTelephone($utilisateurs, $telephone) {
+    $utilisateur = $utilisateurs->xpath("//user[telephone='$telephone']")[0];
+    return $utilisateur ? (string)$utilisateur->id : null;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
@@ -929,5 +935,5 @@ switch ($action) {
                 }
             }
             exit;
-    }
+}
 ?>
