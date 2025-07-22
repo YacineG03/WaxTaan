@@ -693,3 +693,43 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
+
+// Recherche de message dans la discussion
+function openSearchMessageModal() {
+  document.getElementById('searchMessageModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    document.getElementById('searchMessageInput').focus();
+  }, 100);
+}
+
+function closeSearchMessageModal() {
+  document.getElementById('searchMessageModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  document.getElementById('searchMessageResults').innerHTML = '';
+  document.getElementById('searchMessageInput').value = '';
+}
+
+// Recherche en direct dans les messages affichés
+if (document.getElementById('searchMessageInput')) {
+  document.getElementById('searchMessageInput').addEventListener('input', function() {
+    const query = this.value.trim().toLowerCase();
+    const resultsDiv = document.getElementById('searchMessageResults');
+    resultsDiv.innerHTML = '';
+    if (!query) return;
+    // Cherche dans les messages affichés dans .chat-messages
+    const messages = document.querySelectorAll('.chat-messages .message-bubble');
+    let found = 0;
+    messages.forEach(msg => {
+      const text = msg.innerText.toLowerCase();
+      if (text.includes(query)) {
+        const clone = msg.cloneNode(true);
+        resultsDiv.appendChild(clone);
+        found++;
+      }
+    });
+    if (found === 0) {
+      resultsDiv.innerHTML = '<div style="color:#888;text-align:center;">Aucun message trouvé.</div>';
+    }
+  });
+}

@@ -340,6 +340,7 @@
                                 <input type="hidden" name="scope" id="deleteScope" value="self">
                                 <button type="submit" class="modern-btn btn-danger btn-small" style="width:100%;text-align:left;">🗑️ Supprimer la discussion pour moi</button>
                             </form>
+                            <button type="button" class="modern-btn btn-secondary btn-small" onclick="openSearchMessageModal()" style="width:100%;text-align:left;">🔍 Rechercher dans la discussion</button>
                             <?php if ($type === 'groupe' && isset($group_info) && (string)$group_info->id_admin === $id_utilisateur) { ?>
                             <form id="deleteDiscussionAllForm" action="../api.php" method="post" style="margin:0;margin-top:4px;">
                                 <input type="hidden" name="action" value="supprimer_discussion">
@@ -543,6 +544,20 @@
 
     <!-- Champ caché pour le télételephone de l'utilisateur actuel -->
     <input type="hidden" name="current_user_telephone" value="<?php echo $utilisateur_courant->telephone; ?>">
+
+    <!-- Modal de recherche de message -->
+    <div id="searchMessageModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Rechercher un message</h3>
+          <button type="button" class="modal-close" onclick="closeSearchMessageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="searchMessageInput" class="form-input" placeholder="Tapez un mot ou une phrase...">
+          <div id="searchMessageResults" style="margin-top:16px;max-height:250px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
 
     <script src="../js/global.js"></script>
 </body>

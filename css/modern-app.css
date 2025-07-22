@@ -312,11 +312,19 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 
 .modal-body {
   max-height: 400px;
   overflow-y: auto;
+}
+#uploadPreviewBody.modal-body {
+  max-width: 200px;
+}
+
+.modal-body label{
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 
 .nouvelle-discussion-list {
@@ -597,7 +605,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 2%;
+  margin-top: 6%;
 }
 
 #uploadPreviewBody img#previewImageUpload {
