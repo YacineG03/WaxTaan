@@ -506,6 +506,23 @@
         </div>
     </div>
 
+    <!-- Modal de prévisualisation d'upload -->
+    <div id="uploadPreviewModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Prévisualisation du fichier</h3>
+          <button type="button" class="modal-close" onclick="closeUploadPreviewModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="uploadPreviewBody">
+          <!-- Prévisualisation dynamique JS -->
+        </div>
+        <div class="modal-footer" style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="modern-btn btn-secondary" onclick="closeUploadPreviewModal()">Annuler</button>
+          <button type="button" class="modern-btn btn-primary" id="confirmUploadBtn">Envoyer</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Formulaire caché pour la suppression de contact -->
     <form id="deleteContactForm" action="../api.php" method="post" style="display: none;">
         <input type="hidden" name="action" value="delete_contact">

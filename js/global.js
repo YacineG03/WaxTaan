@@ -624,3 +624,72 @@ function demarrerDiscussion(type, id) {
     const url = `view.php?conversation=${type}:${id}&tab=discussions`;
     window.location.href = url;
 }
+
+// ========== MODAL PREVIEW UPLOAD CHAT =============
+
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.querySelector('.file-input');
+  const chatForm = document.querySelector('.chat-input form');
+  let fileToSend = null;
+  let legendInput = null;
+
+  if (fileInput && chatForm) {
+    fileInput.addEventListener('change', function(e) {
+      if (fileInput.files && fileInput.files[0]) {
+        fileToSend = fileInput.files[0];
+        showUploadPreviewModal(fileToSend);
+      }
+    });
+  }
+
+  function showUploadPreviewModal(file) {
+    const modal = document.getElementById('uploadPreviewModal');
+    const body = document.getElementById('uploadPreviewBody');
+    if (!modal || !body) return;
+    let html = '';
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (["jpg","jpeg","png","gif","webp"].includes(ext)) {
+      // Utiliser une image qui s'adapte à sa taille réelle, mais ne dépasse pas la taille du modal
+      html += `<img id='previewImageUpload' src="${URL.createObjectURL(file)}" alt="Image" style="display:block;margin:auto;max-width:100%;max-height:70vh;">`;
+    } else if (["mp4","avi","mov","wmv","flv","webm"].includes(ext)) {
+      html += `<video controls style="max-width:100%;max-height:200px;display:block;margin:auto;"><source src="${URL.createObjectURL(file)}"></video>`;
+    } else {
+      html += `<div style='text-align:center;padding:20px;'><span style='font-size:40px;'>📎</span><br>${file.name}</div>`;
+    }
+    html += `<div style='margin-top:16px;'><label for='uploadLegendInput'>Légende (optionnelle):</label><textarea id='uploadLegendInput' name='uploadLegendInput' style='width:100%;border-radius:8px;padding:8px;margin-top:4px;resize:vertical;'></textarea></div>`;
+    body.innerHTML = html;
+    legendInput = document.getElementById('uploadLegendInput');
+    // Ajuster dynamiquement la taille du modal selon l'image chargée
+    const img = document.getElementById('previewImageUpload');
+    if (img) {
+      img.onload = function() {
+        // Optionnel : ajuster le modal si besoin
+        // Le style max-width/max-height limite déjà l'image à la fenêtre
+      };
+    }
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.closeUploadPreviewModal = function() {
+    const modal = document.getElementById('uploadPreviewModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    if (fileInput) fileInput.value = '';
+    fileToSend = null;
+  };
+
+  const confirmBtn = document.getElementById('confirmUploadBtn');
+  if (confirmBtn) {
+    confirmBtn.onclick = function() {
+      if (!fileToSend) return;
+      // Mettre la légende dans le champ message
+      if (legendInput && chatForm) {
+        chatForm.querySelector('textarea[name="message"]').value = legendInput.value;
+      }
+      // Soumettre le formulaire
+      chatForm.submit();
+      closeUploadPreviewModal();
+    };
+  }
+});
