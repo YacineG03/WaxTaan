@@ -227,22 +227,22 @@
 
                     if ($contact_info) {
                         // Cas contact connu
-                        $contact_user_id = obtenirIdUtilisateurParTelephone($utilisateurs, $contact_info->contact_telephone);
+                        $contact_user_id = obtenirIdUtilisateurParTelephone($utilisateurs, $contact_info->telephone_contact);
                         if ($contact_user_id) {
-                            $messages_to_show = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='{$contact_info->contact_telephone}') or (sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone')]");
-                            foreach ($messages->xpath("//message[sender_id='$contact_user_id' and recipient='$utilisateur_courant->telephone']") as $msg) {
-                                if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
-                                    $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
-                                    $read_by_arr = $read_by ? explode(',', $read_by) : [];
-                                    $read_by_arr[] = $id_utilisateur;
-                                    $msg->read_by = implode(',', array_unique($read_by_arr));
+                            $messages_to_show = $messages->xpath("//message[(id_expediteur='$id_utilisateur' and destinataire='{$contact_info->telephone_contact}') or (id_expediteur='$contact_user_id' and destinataire='$utilisateur_courant->telephone')]");
+                            foreach ($messages->xpath("//message[id_expediteur='$contact_user_id' and destinataire='$utilisateur_courant->telephone']") as $msg) {
+                                if (!isset($msg->lus_par) || !in_array($id_utilisateur, explode(',', (string)$msg->lus_par))) {
+                                    $lus_par = isset($msg->lus_par) ? (string)$msg->lus_par : '';
+                                    $lus_par_arr = $lus_par ? explode(',', $lus_par) : [];
+                                    $lus_par_arr[] = $id_utilisateur;
+                                    $msg->lus_par = implode(',', array_unique($lus_par_arr));
                                 }
                             }
                             $messages->asXML('../xmls/messages.xml');
                         } else {
                             $messages_to_show = [];
                         }
-                        $conversation_name = htmlspecialchars($contact_info->contact_name);
+                        $conversation_name = htmlspecialchars($contact_info->nom_contact);
                         $conversation_avatar = strtoupper(substr($conversation_name, 0, 1));
                     } else {
                         // Cas d'un contact inconnu (pas dans la liste des contacts)
@@ -251,14 +251,14 @@
                         if ($utilisateur_inconnu) {
                             $telephone_inconnu = (string)$utilisateur_inconnu->telephone;
                             // Récupérer les messages entre l'utilisateur courant et l'inconnu
-                            $messages_to_show = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='$telephone_inconnu') or (sender_id='$id' and recipient='$utilisateur_courant->telephone')]");
+                            $messages_to_show = $messages->xpath("//message[(id_expediteur='$id_utilisateur' and destinataire='$telephone_inconnu') or (id_expediteur='$id' and destinataire='$utilisateur_courant->telephone')]");
                             // Marquer comme lus tous les messages reçus non lus
-                            foreach ($messages->xpath("//message[sender_id='$id' and recipient='$utilisateur_courant->telephone']") as $msg) {
-                                if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
-                                    $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
-                                    $read_by_arr = $read_by ? explode(',', $read_by) : [];
-                                    $read_by_arr[] = $id_utilisateur;
-                                    $msg->read_by = implode(',', array_unique($read_by_arr));
+                            foreach ($messages->xpath("//message[id_expediteur='$id' and destinataire='$utilisateur_courant->telephone']") as $msg) {
+                                if (!isset($msg->lus_par) || !in_array($id_utilisateur, explode(',', (string)$msg->lus_par))) {
+                                    $lus_par = isset($msg->lus_par) ? (string)$msg->lus_par : '';
+                                    $lus_par_arr = $lus_par ? explode(',', $lus_par) : [];
+                                    $lus_par_arr[] = $id_utilisateur;
+                                    $msg->lus_par = implode(',', array_unique($lus_par_arr));
                                 }
                             }
                             $messages->asXML('../xmls/messages.xml');
@@ -271,14 +271,14 @@
                         }
                     }
                 } elseif (trim($type) === 'groupe') {
-                    $messages_to_show = $messages->xpath("//message[recipient_group='$id']");
+                    $messages_to_show = $messages->xpath("//message[groupe_destinataire='$id']");
                     // Marquer comme lus tous les messages de groupe non lus
-                    foreach ($messages->xpath("//message[recipient_group='$id']") as $msg) {
-                        if (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by))) {
-                            $read_by = isset($msg->read_by) ? (string)$msg->read_by : '';
-                            $read_by_arr = $read_by ? explode(',', $read_by) : [];
-                            $read_by_arr[] = $id_utilisateur;
-                            $msg->read_by = implode(',', array_unique($read_by_arr));
+                    foreach ($messages->xpath("//message[groupe_destinataire='$id']") as $msg) {
+                        if (!isset($msg->lus_par) || !in_array($id_utilisateur, explode(',', (string)$msg->lus_par))) {
+                            $lus_par = isset($msg->lus_par) ? (string)$msg->lus_par : '';
+                            $lus_par_arr = $lus_par ? explode(',', $lus_par) : [];
+                            $lus_par_arr[] = $id_utilisateur;
+                            $msg->lus_par = implode(',', array_unique($lus_par_arr));
                         }
                     }
                     $messages->asXML('../xmls/messages.xml');
@@ -292,13 +292,12 @@
             
             <?php if ($current_conversation) { ?>
                 <!-- Header du chat -->
-                <div class="chat-header">
+                <div class="chat-header" style="position: relative;">
                     <div class="chat-avatar">
                         <?php if ($type === 'groupe' && $group_info && $group_info->photo_groupe && $group_info->photo_groupe != 'default.jpg') { ?>
                             <img src="../uploads/<?php echo htmlspecialchars($group_info->photo_groupe); ?>" alt="Group Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         <?php } elseif ($type === 'contact' && $contact_info) { 
-                            // Récupérer l'utilisateur contact pour sa photo de profil
-                            $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact_info->contact_telephone}']")[0];
+                            $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact_info->telephone_contact}']")[0];
                             if ($utilisateur_contact && $utilisateur_contact->profile_photo && (string)$utilisateur_contact->profile_photo != 'default.jpg') { ?>
                                 <img src="../uploads/<?php echo htmlspecialchars($utilisateur_contact->profile_photo); ?>" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                             <?php } else { ?>
@@ -312,6 +311,10 @@
                         <h3 style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
                             <?php echo $conversation_name; ?>
                             <a href="?tab=discussions" class="modern-btn btn-danger btn-small" style="margin-left:16px;">✖</a>
+                            <!-- Bouton menu (3 points) -->
+                            <button type="button" class="chat-menu-btn" onclick="toggleChatMenu(event)" style="background:none;border:none;outline:none;cursor:pointer;padding:8px 12px;">
+                                <span style="display:inline-block;font-size:28px;line-height:1;vertical-align:middle;">&#8942;</span>
+                            </button>
                         </h3>
                         <div class="chat-status">
                             <?php if ($type === 'groupe' && $group_info) { ?>
@@ -326,8 +329,47 @@
                                 En ligne
                             <?php } ?>
                         </div>
+                        <!-- Menu déroulant -->
+                        <div id="chatMenu" class="chat-menu-dropdown" style="display:none;position:absolute;top:48px;right:0;z-index:1001;background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px 0;min-width:220px;">
+                            <form id="deleteDiscussionForm" action="../api.php" method="post" style="margin:0;">
+                                <input type="hidden" name="action" value="supprimer_discussion">
+                                <input type="hidden" name="type" value="<?php echo $type; ?>">
+                                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                <input type="hidden" name="scope" id="deleteScope" value="self">
+                                <button type="submit" class="modern-btn btn-danger btn-small" style="width:100%;text-align:left;">🗑️ Supprimer la discussion pour moi</button>
+                            </form>
+                            <?php if ($type === 'groupe' && isset($group_info) && (string)$group_info->id_admin === $id_utilisateur) { ?>
+                            <form id="deleteDiscussionAllForm" action="../api.php" method="post" style="margin:0;margin-top:4px;">
+                                <input type="hidden" name="action" value="supprimer_discussion">
+                                <input type="hidden" name="type" value="groupe">
+                                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                <input type="hidden" name="scope" value="all">
+                                <button type="submit" class="modern-btn btn-danger btn-small" style="width:100%;text-align:left;">🗑️ Supprimer la discussion pour tout le monde</button>
+                            </form>
+                            <?php } ?>
+                        </div>
                     </div>
                 </div>
+                <script>
+                function toggleChatMenu(e) {
+                    e.stopPropagation();
+                    var menu = document.getElementById('chatMenu');
+                    if (menu.style.display === 'none' || menu.style.display === '') {
+                        menu.style.display = 'block';
+                        document.addEventListener('click', closeChatMenuOnClickOutside);
+                    } else {
+                        menu.style.display = 'none';
+                        document.removeEventListener('click', closeChatMenuOnClickOutside);
+                    }
+                }
+                function closeChatMenuOnClickOutside(e) {
+                    var menu = document.getElementById('chatMenu');
+                    if (!menu.contains(e.target)) {
+                        menu.style.display = 'none';
+                        document.removeEventListener('click', closeChatMenuOnClickOutside);
+                    }
+                }
+                </script>
 
                 <!-- Messages -->
                 <div class="chat-messages" id="chat-container">
@@ -339,32 +381,32 @@
                         </div>
                     <?php } else { ?>
                         <?php foreach ($messages_to_show as $message) { ?>
-                            <div class="message-bubble <?php echo $message->sender_id == $id_utilisateur ? 'sent' : 'received'; ?>">
-                                <?php if ($message->sender_id != $id_utilisateur) { ?>
+                            <div class="message-bubble <?php echo $message->id_expediteur == $id_utilisateur ? 'sent' : 'received'; ?>">
+                                <?php if ($message->id_expediteur != $id_utilisateur) { ?>
                                     <div class="message-meta">
                                         <?php
-                                        $sender = $utilisateurs->xpath("//user[id='{$message->sender_id}']")[0];
+                                        $sender = $utilisateurs->xpath("//user[id='{$message->id_expediteur}']")[0];
                                         $sender_tel = (string)$sender->telephone;
-                                        $contact_sender = $contacts->xpath("//contact[user_id='$id_utilisateur' and contact_telephone='$sender_tel']");
+                                        $contact_sender = $contacts->xpath("//contact[id_utilisateur='$id_utilisateur' and telephone_contact='$sender_tel']");
                                         if (!empty($contact_sender)) {
                                             // Afficher le nom du contact
-                                            echo '<span class="message-sender">' . htmlspecialchars($contact_sender[0]->contact_name) . '</span>';
+                                            echo '<span class="message-sender">' . htmlspecialchars($contact_sender[0]->nom_contact) . '</span>';
                                         } else {
                                             // Sinon, afficher nom/prénom du user
                                             echo '<span class="message-sender">' . htmlspecialchars($sender->prenom . ' ' . $sender->nom) . '</span>';
                                         }
                                         ?>
-                                        <span class="message-time"><?php echo date('H:i', strtotime($message['timestamp'] ?? 'now')); ?></span>
+                                        <span class="message-time"><?php echo date('H:i', strtotime($message->date_heure ?? 'now')); ?></span>
                                     </div>
                                 <?php } ?>
                                 
                                 <div class="message-content">
-                                    <p><?php echo htmlspecialchars($message->content); ?></p>
+                                    <p><?php echo htmlspecialchars($message->contenu); ?></p>
                                     
-                                    <?php if ($message->file) { ?>
+                                    <?php if ($message->fichier) { ?>
                                         <div class="message-file" style="margin-top: 8px;">
                                             <?php
-                                            $file_extension = strtolower(pathinfo($message->file, PATHINFO_EXTENSION));
+                                            $file_extension = strtolower(pathinfo($message->fichier, PATHINFO_EXTENSION));
                                             $is_image = in_array($file_extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
                                             $is_video = in_array($file_extension, ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']);
                                             ?>
@@ -372,21 +414,21 @@
                                             <?php if ($is_image) { ?>
                                                 <!-- Affichage des images -->
                                                 <div class="file-preview">
-                                                    <img src="../uploads/<?php echo htmlspecialchars($message->file); ?>" alt="Image" class="message-image" onclick="openImageModal('../uploads/<?php echo htmlspecialchars($message->file); ?>')">
+                                                    <img src="../uploads/<?php echo htmlspecialchars($message->fichier); ?>" alt="Image" class="message-image" onclick="openImageModal('../uploads/<?php echo htmlspecialchars($message->fichier); ?>')">
                                                 </div>
                                             <?php } elseif ($is_video) { ?>
                                                 <!-- Affichage des vidéos -->
                                                 <div class="file-preview">
                                                     <video controls class="message-video">
-                                                        <source src="../uploads/<?php echo htmlspecialchars($message->file); ?>" type="video/<?php echo $file_extension; ?>">
+                                                        <source src="../uploads/<?php echo htmlspecialchars($message->fichier); ?>" type="video/<?php echo $file_extension; ?>">
                                                         Votre navigateur ne supporte pas la lecture de vidéos.
                                                     </video>
                                                 </div>
                                             <?php } else { ?>
                                                 <!-- Affichage des autres fichiers -->
-                                                <a href="../uploads/<?php echo htmlspecialchars($message->file); ?>" download class="file-download">
+                                                <a href="../uploads/<?php echo htmlspecialchars($message->fichier); ?>" download class="file-download">
                                                     <span class="file-icon">📎</span>
-                                                    <span class="file-name"><?php echo htmlspecialchars($message->file); ?></span>
+                                                    <span class="file-name"><?php echo htmlspecialchars($message->fichier); ?></span>
                                                     <span class="file-size">Télécharger</span>
                                                 </a>
                                             <?php } ?>
@@ -394,9 +436,9 @@
                                     <?php } ?>
                                 </div>
                                 
-                                <?php if ($message->sender_id == $id_utilisateur) { ?>
+                                <?php if ($message->id_expediteur == $id_utilisateur) { ?>
                                     <div class="message-meta" style="justify-content: flex-end; margin-top: 4px;">
-                                        <span class="message-time"><?php echo date('H:i', strtotime($message['timestamp'] ?? 'now')); ?></span>
+                                        <span class="message-time"><?php echo date('H:i', strtotime($message->date_heure ?? 'now')); ?></span>
                                     </div>
                                 <?php } ?>
                             </div>
@@ -408,7 +450,7 @@
                 <div class="chat-input">
                     <form action="../api.php" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="send_message">
-                        <input type="hidden" name="recipient" value="<?php echo isset($type) && $type === 'contact' && isset($contact_info) ? htmlspecialchars($contact_info->contact_telephone) : (isset($id) ? htmlspecialchars($id) : ''); ?>">
+                        <input type="hidden" name="recipient" value="<?php echo isset($type) && $type === 'contact' && isset($contact_info) ? htmlspecialchars($contact_info->telephone_contact) : (isset($id) ? htmlspecialchars($id) : ''); ?>">
                         <input type="hidden" name="recipient_type" value="<?php echo isset($type) ? $type : ''; ?>">
                         
                         <div class="input-container">

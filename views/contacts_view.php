@@ -26,14 +26,16 @@
             </div>
             
             <div class="form-actions">
+                <div class="button-group">
                 <button type="submit" class="modern-btn btn-primary">
                     <span>➕</span>
                     Ajouter Contact
                 </button>
-                <button type="button" onclick="cacherFormulaireAjoutContact()" class="modern-btn btn-secondary">
+                    <button type="button" onclick="cacherFormulaireAjoutContact()" class="modern-btn btn-secondary">
                     <span>❌</span>
                     Annuler
                 </button>
+                </div>
             </div>
         </form>
     </div>
@@ -60,14 +62,14 @@
     </form>
 </div>
 
-  <div class="search-bar">
+<div class="search-bar">
     <input type="text" id="rechercheContacts" placeholder="Rechercher un contact...">
-  </div>
+</div>
 
 <div class="modern-list">
-    <?php foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) { ?>
+    <?php foreach ($contacts->xpath("//contact[id_utilisateur='$id_utilisateur']") as $contact) { ?>
         <?php
-        $utilisateur_contact_result = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']");
+        $utilisateur_contact_result = $utilisateurs->xpath("//user[telephone='{$contact->telephone_contact}']");
         $utilisateur_contact = !empty($utilisateur_contact_result) ? $utilisateur_contact_result[0] : null;
         if ($utilisateur_contact) {
         ?>
@@ -76,20 +78,20 @@
                     <?php if ($utilisateur_contact->profile_photo && $utilisateur_contact->profile_photo != 'default.jpg') { ?>
                         <img src="../uploads/<?php echo htmlspecialchars($utilisateur_contact->profile_photo); ?>" alt="Photo">
                     <?php } else { ?>
-                        <?php echo strtoupper(substr($contact->contact_name, 0, 1)); ?>
+                        <?php echo strtoupper(substr($contact->nom_contact, 0, 1)); ?>
                     <?php } ?>
                 </div>
                 
                 <div class="item-content">
-                    <div class="item-name"><?php echo htmlspecialchars($contact->contact_name); ?></div>
-                    <div class="item-meta"><?php echo htmlspecialchars($contact->contact_telephone); ?></div>
+                    <div class="item-name"><?php echo htmlspecialchars($contact->nom_contact); ?></div>
+                    <div class="item-meta"><?php echo htmlspecialchars($contact->telephone_contact); ?></div>
                 </div>
                 
                 <div class="item-actions">
-                    <button type="button" onclick="afficherFormulaireEditionContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-secondary btn-small">
+                    <button type="button" onclick="afficherFormulaireEditionContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->nom_contact); ?>')" class="modern-btn btn-secondary btn-small">
                         ✏️
                     </button>
-                    <button type="button" onclick="confirmerSuppressionContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->contact_name); ?>')" class="modern-btn btn-danger btn-small">
+                    <button type="button" onclick="confirmerSuppressionContact('<?php echo $contact->id; ?>', '<?php echo htmlspecialchars($contact->nom_contact); ?>')" class="modern-btn btn-danger btn-small">
                         🗑️
                     </button>
                 </div>
@@ -97,7 +99,7 @@
         <?php } ?>
     <?php } ?>
     
-    <?php if (empty($contacts->xpath("//contact[user_id='$id_utilisateur']"))) { ?>
+    <?php if (empty($contacts->xpath("//contact[id_utilisateur='$id_utilisateur']"))) { ?>
         <div class="empty-state">
             <div class="empty-icon">👥</div>
             <h3>Aucun contact</h3>

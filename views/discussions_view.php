@@ -1,9 +1,12 @@
 <?php
+if (!isset($contacts)) {
+    require_once '../controller.php';
+}
 // Les fonctions sont déjà définies dans controller.php, pas besoin de les redéclarer ici
 ?>
 <div class="profile-section">
     <div class="section-header">
-        <h2>Mes Discussions</h2>
+    <h2>Mes Discussions</h2>
     </div>
     <div class="section-actions">
         <button type="button" onclick="afficherModalNouvelleDiscussion()" class="modern-btn btn-primary btn-large">
@@ -19,20 +22,20 @@
 <div class="modern-list">
 <?php
 // Récupérer tous les contacts avec leurs messages
-$contacts_utilisateur = $contacts->xpath("//contact[user_id='$id_utilisateur']");
+$contacts_utilisateur = $contacts->xpath("//contact[id_utilisateur='$id_utilisateur']");
 $discussions = [];
 // Discussions avec contacts
 foreach ($contacts_utilisateur as $contact) {
-    $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+    $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->telephone_contact}']")[0];
     if ($utilisateur_contact) {
-        $nb_non_lus = compterMessagesNonLus($messages, $utilisateur_courant->telephone, $contact->contact_telephone);
-        $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($utilisateurs, $contact->contact_telephone);
-        $messages_conversation = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='$contact->contact_telephone') or (sender_id='$id_utilisateur_contact' and recipient='$utilisateur_courant->telephone')]");
+        $nb_non_lus = compterMessagesNonLus($messages, $utilisateur_courant->telephone, $contact->telephone_contact);
+        $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($utilisateurs, $contact->telephone_contact);
+        $messages_conversation = $messages->xpath("//message[(id_expediteur='$id_utilisateur' and destinataire='$contact->telephone_contact') or (id_expediteur='$id_utilisateur_contact' and destinataire='$utilisateur_courant->telephone')]");
         if (!empty($messages_conversation)) {
-            // Trier les messages par timestamp (plus récent en dernier)
+            // Trier les messages par date_heure (plus récent en dernier)
             usort($messages_conversation, function($a, $b) {
-                $timestamp_a = (string)$a->timestamp;
-                $timestamp_b = (string)$b->timestamp;
+                $timestamp_a = (string)$a->date_heure;
+                $timestamp_b = (string)$b->date_heure;
                 return strtotime($timestamp_a) - strtotime($timestamp_b);
             });
             $derniers_messages = end($messages_conversation);
@@ -73,12 +76,12 @@ foreach ($groupes->group as $groupe) {
     }
 }
 foreach ($groupes_utilisateur as $groupe) {
-    $messages_groupe = $messages->xpath("//message[recipient_group='{$groupe->id}']");
+    $messages_groupe = $messages->xpath("//message[groupe_destinataire='{$groupe->id}']");
     if (!empty($messages_groupe)) {
-        // Trier les messages par timestamp (plus récent en dernier)
+        // Trier les messages par date_heure (plus récent en dernier)
         usort($messages_groupe, function($a, $b) {
-            $timestamp_a = (string)$a->timestamp;
-            $timestamp_b = (string)$b->timestamp;
+            $timestamp_a = (string)$a->date_heure;
+            $timestamp_b = (string)$b->date_heure;
             return strtotime($timestamp_a) - strtotime($timestamp_b);
         });
         $derniers_messages = end($messages_groupe);
@@ -92,15 +95,15 @@ foreach ($groupes_utilisateur as $groupe) {
     }
 }
 // Discussions avec des inconnus (expéditeurs non enregistrés comme contact)
-$messages_recus = $messages->xpath("//message[recipient='$utilisateur_courant->telephone']");
+$messages_recus = $messages->xpath("//message[destinataire='$utilisateur_courant->telephone']");
 $expediteurs_inconnus = [];
 foreach ($messages_recus as $msg) {
-    $id_expediteur = (string)$msg->sender_id;
-    // Vérifier si ce sender_id est déjà dans les contacts
+    $id_expediteur = (string)$msg->id_expediteur;
+    // Vérifier si ce id_expediteur est déjà dans les contacts
     $utilisateur_expediteur = $utilisateurs->xpath("//user[id='$id_expediteur']");
     if ($utilisateur_expediteur) {
         $telephone_expediteur = (string)$utilisateur_expediteur[0]->telephone;
-        $contact_existe = $contacts->xpath("//contact[user_id='$id_utilisateur' and contact_telephone='$telephone_expediteur']");
+        $contact_existe = $contacts->xpath("//contact[id_utilisateur='$id_utilisateur' and telephone_contact='$telephone_expediteur']");
         if (!$contact_existe && $id_expediteur != $id_utilisateur) {
             // On n'a pas encore ajouté ce numéro comme contact
             $expediteurs_inconnus[$id_expediteur] = $msg;
@@ -112,18 +115,18 @@ foreach ($expediteurs_inconnus as $id_expediteur => $dernier_msg) {
     $utilisateur_expediteur = $utilisateurs->xpath("//user[id='$id_expediteur']")[0];
     $telephone_expediteur = (string)$utilisateur_expediteur->telephone;
     // Récupérer tous les messages de cette personne
-    $messages_conversation = $messages->xpath("//message[(sender_id='$id_expediteur' and recipient='$utilisateur_courant->telephone') or (sender_id='$id_utilisateur' and recipient='$telephone_expediteur')]");
+    $messages_conversation = $messages->xpath("//message[(id_expediteur='$id_expediteur' and destinataire='$utilisateur_courant->telephone') or (id_expediteur='$id_utilisateur' and destinataire='$telephone_expediteur')]");
     // Trier par date
     usort($messages_conversation, function($a, $b) {
-        $timestamp_a = (string)$a->timestamp;
-        $timestamp_b = (string)$b->timestamp;
+        $timestamp_a = (string)$a->date_heure;
+        $timestamp_b = (string)$b->date_heure;
         return strtotime($timestamp_a) - strtotime($timestamp_b);
     });
     $dernier_message = end($messages_conversation);
     // Compter les non lus
     $nb_non_lus = 0;
     foreach ($messages_conversation as $msg) {
-        if ($msg->sender_id == $id_expediteur && (!isset($msg->read_by) || !in_array($id_utilisateur, explode(',', (string)$msg->read_by)))) {
+        if ($msg->id_expediteur == $id_expediteur && (!isset($msg->lus_par) || !in_array($id_utilisateur, explode(',', (string)$msg->lus_par)))) {
             $nb_non_lus++;
         }
     }
@@ -139,8 +142,8 @@ foreach ($expediteurs_inconnus as $id_expediteur => $dernier_msg) {
 // Trier les discussions par date du dernier message (plus récent en premier)
 usort($discussions, function($a, $b) {
     if ($a['derniers_messages'] && $b['derniers_messages']) {
-        $timestamp_a = (string)$a['derniers_messages']->timestamp;
-        $timestamp_b = (string)$b['derniers_messages']->timestamp;
+        $timestamp_a = (string)$a['derniers_messages']->date_heure;
+        $timestamp_b = (string)$b['derniers_messages']->date_heure;
         return strtotime($timestamp_b) - strtotime($timestamp_a);
     } elseif ($a['derniers_messages']) {
         return -1;
@@ -172,12 +175,12 @@ foreach ($discussions as $discussion) {
                 <div class="item-meta">
                     <?php if ($dernier_message) { ?>
                         <span class="message-preview">
-                            <?php echo $dernier_message->sender_id == $id_utilisateur ? 'Vous: ' : ''; ?>
-                            <?php echo htmlspecialchars(substr($dernier_message->content, 0, 50)); ?>
-                            <?php if (strlen($dernier_message->content) > 50) echo '...'; ?>
+                            <?php echo $dernier_message->id_expediteur == $id_utilisateur ? 'Vous: ' : ''; ?>
+                            <?php echo htmlspecialchars(substr($dernier_message->contenu, 0, 50)); ?>
+                            <?php if (strlen($dernier_message->contenu) > 50) echo '...'; ?>
                         </span>
                         <span class="message-time">
-                            <?php echo date('d/m H:i', strtotime((string)$dernier_message->timestamp ?? 'now')); ?>
+                            <?php echo date('d/m H:i', strtotime((string)$dernier_message->date_heure ?? 'now')); ?>
                         </span>
                     <?php } else { ?>
                         <span class="no-messages">Aucun message</span>
@@ -203,12 +206,12 @@ foreach ($discussions as $discussion) {
             <?php if ($utilisateur_contact->profile_photo && (string)$utilisateur_contact->profile_photo != 'default.jpg') { ?>
                 <img src="../uploads/<?php echo htmlspecialchars($utilisateur_contact->profile_photo); ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             <?php } else { ?>
-                <?php echo strtoupper(substr($contact->contact_name, 0, 1)); ?>
+                <?php echo strtoupper(substr($contact->nom_contact, 0, 1)); ?>
             <?php } ?>
         </div>
         <div class="item-content">
             <div class="item-name">
-                <?php echo htmlspecialchars($contact->contact_name); ?>
+                <?php echo htmlspecialchars($contact->nom_contact); ?>
                 <?php if ($nb_non_lus > 0) { ?>
                     <span class="unread-badge"><?php echo $nb_non_lus; ?></span>
                 <?php } ?>
@@ -216,16 +219,16 @@ foreach ($discussions as $discussion) {
             <div class="item-meta">
                 <?php if ($derniers_messages) { ?>
                     <?php 
-                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->sender_id}']")[0];
-                    $envoye_par_moi = $derniers_messages->sender_id == $id_utilisateur;
+                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->id_expediteur}']")[0];
+                    $envoye_par_moi = $derniers_messages->id_expediteur == $id_utilisateur;
                     ?>
                     <span class="message-preview">
                         <?php echo $envoye_par_moi ? 'Vous: ' : ''; ?>
-                        <?php echo htmlspecialchars(substr($derniers_messages->content, 0, 50)); ?>
-                        <?php if (strlen($derniers_messages->content) > 50) echo '...'; ?>
+                        <?php echo htmlspecialchars(substr($derniers_messages->contenu, 0, 50)); ?>
+                        <?php if (strlen($derniers_messages->contenu) > 50) echo '...'; ?>
                     </span>
                     <span class="message-time">
-                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->timestamp ?? 'now')); ?>
+                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->date_heure ?? 'now')); ?>
                     </span>
                 <?php } else { ?>
                     <span class="no-messages">Aucun message</span>
@@ -263,16 +266,16 @@ foreach ($discussions as $discussion) {
             <div class="item-meta">
                 <?php if ($derniers_messages) { ?>
                     <?php 
-                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->sender_id}']")[0];
-                    $envoye_par_moi = $derniers_messages->sender_id == $id_utilisateur;
+                    $expediteur = $utilisateurs->xpath("//user[id='{$derniers_messages->id_expediteur}']")[0];
+                    $envoye_par_moi = $derniers_messages->id_expediteur == $id_utilisateur;
                     ?>
                     <span class="message-preview">
                         <?php echo $envoye_par_moi ? 'Vous: ' : ($expediteur ? htmlspecialchars($expediteur->prenom . ': ') : ''); ?>
-                        <?php echo htmlspecialchars(substr($derniers_messages->content, 0, 50)); ?>
-                        <?php if (strlen($derniers_messages->content) > 50) echo '...'; ?>
+                        <?php echo htmlspecialchars(substr($derniers_messages->contenu, 0, 50)); ?>
+                        <?php if (strlen($derniers_messages->contenu) > 50) echo '...'; ?>
                     </span>
                     <span class="message-time">
-                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->timestamp ?? 'now')); ?>
+                        <?php echo date('d/m H:i', strtotime((string)$derniers_messages->date_heure ?? 'now')); ?>
                     </span>
                 <?php } else { ?>
                     <span class="no-messages">Aucun message</span>
@@ -295,7 +298,7 @@ foreach ($discussions as $discussion) {
         <p>Commencez à discuter avec vos contacts ou groupes pour voir vos conversations ici.</p>
     </div>
 <?php } ?>
-</div>
+</div> 
 
 <!-- Modal Nouvelle Discussion -->
 <div id="modalNouvelleDiscussion" class="modal" style="display: none;">

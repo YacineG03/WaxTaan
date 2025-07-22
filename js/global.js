@@ -497,7 +497,8 @@ function gererActionGroupeSelect(select, idGroupe) {
     
     switch(action) {
         case 'ouvrir_conversation':
-            window.location.href = 'discussions_view.php?groupe=' + idGroupe;
+            // window.location.href = 'discussions_view.php?groupe=' + idGroupe;
+            window.location.href = '?conversation=groupe:' + idGroupe + '&tab=discussions';
             break;
         case 'lister_membres':
             document.getElementById('liste-membres-' + idGroupe).style.display = 'block';

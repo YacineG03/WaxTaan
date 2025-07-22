@@ -71,7 +71,7 @@ switch ($action) {
                 $telephone_contact = htmlspecialchars($_POST['telephone_contact']);
                 
                 // Vérifier si le contact existe déjà pour cet utilisateur
-                $contact_existant = $contacts->xpath("//contact[user_id='$id_utilisateur' and contact_telephone='$telephone_contact']")[0];
+                $contact_existant = $contacts->xpath("//contact[id_utilisateur='$id_utilisateur' and telephone_contact='$telephone_contact']")[0];
                 
                 if ($contact_existant) {
                     // Le contact existe déjà
@@ -96,9 +96,9 @@ switch ($action) {
                 // Ajouter le contact
                 $contact = $contacts->addChild('contact');
                 $contact->addChild('id', uniqid());
-                $contact->addChild('user_id', $id_utilisateur);
-                $contact->addChild('contact_name', $nom_contact);
-                $contact->addChild('contact_telephone', $telephone_contact);
+                $contact->addChild('id_utilisateur', $id_utilisateur);
+                $contact->addChild('nom_contact', $nom_contact);
+                $contact->addChild('telephone_contact', $telephone_contact);
                 
                 // Sauvegarder le fichier
                 $resultat = $contacts->asXML('xmls/contacts.xml');
@@ -116,13 +116,18 @@ switch ($action) {
         case 'creer_groupe':
             // Créer un groupe
             if (!isset($_POST['ids_membres']) || count($_POST['ids_membres']) < 2) {
-                            header('Location: views/view.php?error=minimum_two_members');
-            exit;
+                header('Location: views/view.php?error=minimum_two_members');
+                exit;
             }
             $groupe = $groupes->addChild('group');
             $groupe->addChild('id', uniqid());
             $groupe->addChild('name', htmlspecialchars($_POST['nom_groupe']));
             $groupe->addChild('id_admin', $id_utilisateur);
+            // Ajouter coadmins si fournis (optionnel)
+            if (isset($_POST['coadmins']) && !empty($_POST['coadmins'])) {
+                $groupe->addChild('coadmins', htmlspecialchars($_POST['coadmins']));
+            }
+            // Ajouter la photo de groupe si fournie (optionnel)
             if (isset($_FILES['photo_groupe']) && $_FILES['photo_groupe']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = 'uploads/';
                 $nom_fichier = uniqid() . '_' . basename($_FILES['photo_groupe']['name']);
@@ -131,6 +136,7 @@ switch ($action) {
                     $groupe->addChild('photo_groupe', $nom_fichier);
                 }
             }
+            // Ajouter les membres
             foreach ($_POST['ids_membres'] as $id_membre) {
                 $groupe->addChild('id_membre', htmlspecialchars($id_membre));
             }
@@ -147,23 +153,23 @@ switch ($action) {
             if (isset($_POST['destinataire'], $_POST['message'], $_POST['type_destinataire'])) {
                 $message = $messages->addChild('message');
                 $message->addChild('id', uniqid());
-                $message->addChild('sender_id', $id_utilisateur);
+                $message->addChild('id_expediteur', $id_utilisateur);
                 if ($_POST['type_destinataire'] === 'contact') {
-                    $message->addChild('recipient', htmlspecialchars($_POST['destinataire']));
+                    $message->addChild('destinataire', htmlspecialchars($_POST['destinataire']));
                 } elseif ($_POST['type_destinataire'] === 'groupe') {
-                    $message->addChild('recipient_group', htmlspecialchars($_POST['destinataire']));
+                    $message->addChild('groupe_destinataire', htmlspecialchars($_POST['destinataire']));
                 }
-                $message->addChild('content', htmlspecialchars($_POST['message']));
+                $message->addChild('contenu', htmlspecialchars($_POST['message']));
                 if (isset($_FILES['fichier']) && $_FILES['fichier']['error'] === UPLOAD_ERR_OK) {
                     $upload_dir = 'uploads/';
                     $nom_fichier = uniqid() . '_' . basename($_FILES['fichier']['name']);
                     $fichier_cible = $upload_dir . $nom_fichier;
                     if (move_uploaded_file($_FILES['fichier']['tmp_name'], $fichier_cible)) {
-                        $message->addChild('file', $nom_fichier);
+                        $message->addChild('fichier', $nom_fichier);
                     }
                 }
-                $message->addChild('read_by', '');
-                $message->addAttribute('timestamp', date('Y-m-d\TH:i:s'));
+                $message->addChild('lus_par', '');
+                $message->addChild('date_heure', date('Y-m-d\TH:i:s'));
                 $messages->asXML('xmls/messages.xml');
             }
             header('Location: views/view.php?conversation=' . ($_POST['type_destinataire'] === 'groupe' ? 'groupe:' : 'contact:') . urlencode($_POST['destinataire']));
@@ -179,7 +185,7 @@ switch ($action) {
                 
                 if ($contact) {
                     // Vérifier que l'utilisateur connecté est le propriétaire du contact
-                    if ((string)$contact->user_id === $id_utilisateur) {
+                    if ((string)$contact->id_utilisateur === $id_utilisateur) {
                         // Supprimer le contact
                     $dom = dom_import_simplexml($contact);
                     $dom->parentNode->removeChild($dom);
@@ -214,9 +220,9 @@ switch ($action) {
                 
                 if ($contact) {
                     // Vérifier que l'utilisateur connecté est le propriétaire du contact
-                    if ((string)$contact->user_id === $id_utilisateur) {
+                    if ((string)$contact->id_utilisateur === $id_utilisateur) {
                         // Modifier le nom du contact
-                        $contact->contact_name = $nouveau_nom;
+                        $contact->nom_contact = $nouveau_nom;
                         
                         // Sauvegarder le fichier
                         $resultat = $contacts->asXML('xmls/contacts.xml');
@@ -754,8 +760,8 @@ switch ($action) {
                 $contact = $contacts->xpath("//contact[id='$id_contact']")[0];
                 if ($contact) {
                     // Vérifier que l'utilisateur connecté est le propriétaire du contact
-                    if ((string)$contact->user_id === $id_utilisateur) {
-                        $contact->contact_name = $nouveau_nom;
+                    if ((string)$contact->id_utilisateur === $id_utilisateur) {
+                        $contact->nom_contact = $nouveau_nom;
                         $resultat = $contacts->asXML('xmls/contacts.xml');
                         if ($resultat) {
                             header('Location: views/view.php?success=contact_edited');
@@ -779,31 +785,27 @@ switch ($action) {
                 $recipient = htmlspecialchars($_POST['recipient']);
                 $recipient_type = htmlspecialchars($_POST['recipient_type']);
                 
-                // Créer un nouveau message
+                // Créer un nouveau message dans l'ordre du XSD
                 $message = $messages->addChild('message');
                 $message->addChild('id', uniqid());
-                $message->addChild('sender_id', $id_utilisateur);
-                $message->addChild('content', $message_content);
-                $message->addChild('timestamp', date('Y-m-d\TH:i:s'));
-                $message->addChild('read_by', '');
-                
+                $message->addChild('id_expediteur', $id_utilisateur);
                 if ($recipient_type === 'contact') {
-                    // Message vers un contact (utilise le numéro de téléphone)
-                    $message->addChild('recipient', $recipient);
+                    $message->addChild('destinataire', $recipient);
                 } elseif ($recipient_type === 'groupe') {
-                    // Message vers un groupe
-                    $message->addChild('recipient_group', $recipient);
+                    $message->addChild('groupe_destinataire', $recipient);
                 }
-                
+                $message->addChild('contenu', $message_content);
                 // Gestion des fichiers
                 if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
                     $upload_dir = 'uploads/';
                     $nom_fichier = uniqid() . '_' . basename($_FILES['file']['name']);
                     $fichier_cible = $upload_dir . $nom_fichier;
                     if (move_uploaded_file($_FILES['file']['tmp_name'], $fichier_cible)) {
-                        $message->addChild('file', $nom_fichier);
+                        $message->addChild('fichier', $nom_fichier);
                     }
                 }
+                $message->addChild('lus_par', '');
+                $message->addChild('date_heure', date('Y-m-d\TH:i:s'));
                 
                 // Sauvegarder le message
                 $resultat = $messages->asXML('xmls/messages.xml');
@@ -812,7 +814,7 @@ switch ($action) {
                     // Rediriger vers la conversation
                     if ($recipient_type === 'contact') {
                         // Pour les contacts, récupérer l'ID du contact à partir du numéro de téléphone
-                        $contact_info = $contacts->xpath("//contact[contact_telephone='$recipient' and user_id='$id_utilisateur']")[0];
+                        $contact_info = $contacts->xpath("//contact[telephone_contact='$recipient' and id_utilisateur='$id_utilisateur']")[0];
                         if ($contact_info) {
                             $redirect_url = 'views/view.php?conversation=contact:' . urlencode($contact_info->id) . '&tab=discussions';
                         } else {
@@ -834,19 +836,19 @@ switch ($action) {
         case 'charger_nouvelle_discussion':
             // Récupérer les contacts sans messages
             $contacts_sans_messages = [];
-            $contacts_utilisateur = $contacts->xpath("//contact[user_id='$id_utilisateur']");
+            $contacts_utilisateur = $contacts->xpath("//contact[id_utilisateur='$id_utilisateur']");
             
             foreach ($contacts_utilisateur as $contact) {
-                $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+                $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->telephone_contact}']")[0];
                 if ($utilisateur_contact) {
-                    $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($utilisateurs, $contact->contact_telephone);
-                    $messages_conversation = $messages->xpath("//message[(sender_id='$id_utilisateur' and recipient='$contact->contact_telephone') or (sender_id='$id_utilisateur_contact' and recipient='$utilisateur_courant->telephone')]");
+                    $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($utilisateurs, $contact->telephone_contact);
+                    $messages_conversation = $messages->xpath("//message[(id_expediteur='$id_utilisateur' and destinataire='$contact->telephone_contact') or (id_expediteur='$id_utilisateur_contact' and destinataire='$utilisateur_courant->telephone')]");
                     
                     if (empty($messages_conversation)) {
                         $contacts_sans_messages[] = [
                             'id' => $contact->id,
-                            'nom' => $contact->contact_name,
-                            'telephone' => $contact->contact_telephone,
+                            'nom' => $contact->nom_contact,
+                            'telephone' => $contact->telephone_contact,
                             'photo' => $utilisateur_contact->profile_photo
                         ];
                     }
@@ -875,7 +877,7 @@ switch ($action) {
                 }
                 
                 if ($est_admin || $est_coadmin || $est_membre) {
-                    $messages_groupe = $messages->xpath("//message[recipient_group='{$groupe->id}']");
+                    $messages_groupe = $messages->xpath("//message[groupe_destinataire='{$groupe->id}']");
                     if (empty($messages_groupe)) {
                         $groupes_sans_messages[] = [
                             'id' => $groupe->id,
@@ -933,6 +935,70 @@ switch ($action) {
                     echo '</div>';
                     echo '</div>';
                 }
+            }
+            exit;
+
+        case 'supprimer_discussion':
+            $type = $_POST['type'] ?? '';
+            $id = $_POST['id'] ?? '';
+            $scope = $_POST['scope'] ?? 'self'; // 'self' ou 'all'
+            $modif = false;
+
+            if ($type === 'contact' && $id) {
+                // Récupérer le téléphone du contact
+                $contact = $contacts->xpath("//contact[id='$id']")[0];
+                if ($contact) {
+                    $tel_contact = (string)$contact->telephone_contact;
+                    // Supprimer tous les messages entre l'utilisateur courant et ce contact
+                    foreach ($messages->message as $msg) {
+                        if (
+                            ($msg->id_expediteur == $id_utilisateur && $msg->destinataire == $tel_contact) ||
+                            ($msg->id_expediteur == obtenirIdUtilisateurParTelephone($utilisateurs, $tel_contact) && $msg->destinataire == $utilisateur_courant->telephone)
+                        ) {
+                            $dom = dom_import_simplexml($msg);
+                            $dom->parentNode->removeChild($dom);
+                            $modif = true;
+                        }
+                    }
+                }
+            } elseif ($type === 'groupe' && $id) {
+                // Vérifier si l'utilisateur est admin du groupe
+                $groupe = $groupes->xpath("//group[id='$id']")[0];
+                $is_admin = $groupe && ((string)$groupe->id_admin === $id_utilisateur);
+                foreach ($messages->message as $msg) {
+                    if (isset($msg->groupe_destinataire) && $msg->groupe_destinataire == $id) {
+                        if ($scope === 'all' && $is_admin) {
+                            // Admin : suppression pour tout le monde
+                            $dom = dom_import_simplexml($msg);
+                            $dom->parentNode->removeChild($dom);
+                            $modif = true;
+                        } elseif ($scope === 'self' || !$is_admin) {
+                            // Suppression pour soi : on ajoute l'utilisateur courant à lus_par (ou on retire le message de l'affichage côté vue)
+                            // Ici, on supprime le message du XML pour l'utilisateur courant uniquement si tu veux une vraie suppression (sinon, il faut gérer côté affichage)
+                            // Pour la simplicité, on supprime du XML pour l'utilisateur courant
+                            if ($msg->id_expediteur == $id_utilisateur) {
+                                $dom = dom_import_simplexml($msg);
+                                $dom->parentNode->removeChild($dom);
+                                $modif = true;
+                            } else {
+                                // Pour les messages reçus, on peut ajouter l'utilisateur à lus_par pour ne plus les afficher
+                                $lus_par = isset($msg->lus_par) ? (string)$msg->lus_par : '';
+                                $lus_arr = $lus_par ? explode(',', $lus_par) : [];
+                                if (!in_array($id_utilisateur, $lus_arr)) {
+                                    $lus_arr[] = $id_utilisateur;
+                                    $msg->lus_par = implode(',', array_unique($lus_arr));
+                                    $modif = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if ($modif) {
+                $messages->asXML('xmls/messages.xml');
+                header('Location: views/view.php?tab=discussions&success=discussion_deleted');
+            } else {
+                header('Location: views/view.php?tab=discussions&error=discussion_delete_failed');
             }
             exit;
 }

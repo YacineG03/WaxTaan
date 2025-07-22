@@ -23,11 +23,11 @@ function compterMessagesNonLus($messages, $telephone_utilisateur_courant, $telep
     $id_utilisateur_contact = obtenirIdUtilisateurParTelephone($GLOBALS['utilisateurs'], $telephone_contact);
     if (!$id_utilisateur_contact) return 0;
     // Messages reçus de ce contact (envoyés par le contact à l'utilisateur connecté)
-    $messages_recus = $messages->xpath("//message[sender_id='$id_utilisateur_contact' and recipient='$telephone_utilisateur_courant']");
+    $messages_recus = $messages->xpath("//message[id_expediteur='$id_utilisateur_contact' and destinataire='$telephone_utilisateur_courant']");
     $non_lus = 0;
     $id_utilisateur_courant = $GLOBALS['id_utilisateur'];
     foreach ($messages_recus as $msg) {
-        if (!isset($msg->read_by) || !in_array($id_utilisateur_courant, explode(',', (string)$msg->read_by))) {
+        if (!isset($msg->lus_par) || !in_array($id_utilisateur_courant, explode(',', (string)$msg->lus_par))) {
             $non_lus++;
         }
     }
@@ -37,12 +37,12 @@ function compterMessagesNonLus($messages, $telephone_utilisateur_courant, $telep
 // Récupérer les discussions (contacts et groupes)
 $conversations = [];
 if ($utilisateur_courant) {
-    foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) {
-        $nb_non_lus = compterMessagesNonLus($messages, $utilisateur_courant->telephone, $contact->contact_telephone);
+    foreach ($contacts->xpath("//contact[id_utilisateur='$id_utilisateur']") as $contact) {
+        $nb_non_lus = compterMessagesNonLus($messages, $utilisateur_courant->telephone, $contact->telephone_contact);
         $conversations[] = [
             'type' => 'contact', 
-            'id' => (string)$contact->contact_telephone, 
-            'nom' => (string)$contact->contact_name,
+            'id' => (string)$contact->telephone_contact, 
+            'nom' => (string)$contact->nom_contact,
             'nb_non_lus' => $nb_non_lus
         ];
     }

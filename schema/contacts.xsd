@@ -7,16 +7,16 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="id" type="xs:string"/>
-                            <xs:element name="user_id" type="xs:string"/>
-                            <xs:element name="contact_name" type="xs:string"/>
-                            <xs:element name="contact_telephone">
+                            <xs:element name="id_utilisateur" type="xs:string"/>
+                            <xs:element name="nom_contact" type="xs:string"/>
+                            <xs:element name="telephone_contact">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:pattern value="(77|70|78|76)[0-9]{7}"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="contact_photo" type="xs:string" minOccurs="0"/>
+                            <xs:element name="photo_contact" type="xs:string" minOccurs="0"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

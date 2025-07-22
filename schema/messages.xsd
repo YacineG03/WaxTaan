@@ -7,14 +7,14 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="id" type="xs:string"/>
-                            <xs:element name="sender_id" type="xs:string"/>
-                            <xs:element name="recipient" type="xs:string" minOccurs="0"/>
-                            <xs:element name="recipient_group" type="xs:string" minOccurs="0"/>
-                            <xs:element name="content" type="xs:string"/>
-                            <xs:element name="file" type="xs:string" minOccurs="0"/>
-                            <xs:element name="read_by" type="xs:string" minOccurs="0"/>
+                            <xs:element name="id_expediteur" type="xs:string"/>
+                            <xs:element name="destinataire" type="xs:string" minOccurs="0"/>
+                            <xs:element name="groupe_destinataire" type="xs:string" minOccurs="0"/>
+                            <xs:element name="contenu" type="xs:string"/>
+                            <xs:element name="fichier" type="xs:string" minOccurs="0"/>
+                            <xs:element name="lus_par" type="xs:string" minOccurs="0"/>
+                            <xs:element name="date_heure" type="xs:dateTime"/>
                         </xs:sequence>
-                        <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>

@@ -2,9 +2,9 @@
 <contacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schema/contacts.xsd">
     <contact>
         <id>6871aa821a11e</id>
-        <user_id>6871aa2634117</user_id>
-        <contact_name>Yacine GUEYE</contact_name>
-        <contact_telephone>777777777</contact_telephone>
+        <id_utilisateur>6871aa2634117</id_utilisateur>
+        <nom_contact>Yacine GUEYE</nom_contact>
+        <telephone_contact>777777777</telephone_contact>
     </contact>
     
-<contact><id>6873f61d8d533</id><user_id>6871aa2634117</user_id><contact_name>Maarieee</contact_name><contact_telephone>788888888</contact_telephone></contact><contact><id>6875627cd7069</id><user_id>6871a82975833</user_id><contact_name>Assiaah</contact_name><contact_telephone>700000000</contact_telephone></contact><contact><id>6875743d9d082</id><user_id>6871a82975833</user_id><contact_name>Marie</contact_name><contact_telephone>788888888</contact_telephone></contact><contact><id>687e928d313e3</id><user_id>687e9279f3ec1</user_id><contact_name>yass</contact_name><contact_telephone>777777777</contact_telephone></contact><contact><id>687e9bbbb39f2</id><user_id>6871a82975833</user_id><contact_name>Bestiee</contact_name><contact_telephone>789999999</contact_telephone></contact></contacts>
+<contact><id>6873f61d8d533</id><id_utilisateur>6871aa2634117</id_utilisateur><nom_contact>Maarieee</nom_contact><telephone_contact>788888888</telephone_contact></contact><contact><id>6875627cd7069</id><id_utilisateur>6871a82975833</id_utilisateur><nom_contact>Assiaah</nom_contact><telephone_contact>700000000</telephone_contact></contact><contact><id>6875743d9d082</id><id_utilisateur>6871a82975833</id_utilisateur><nom_contact>Marie</nom_contact><telephone_contact>788888888</telephone_contact></contact><contact><id>687e928d313e3</id><id_utilisateur>687e9279f3ec1</id_utilisateur><nom_contact>yass</nom_contact><telephone_contact>777777777</telephone_contact></contact><contact><id>687ed383e6db4</id><id_utilisateur>6871a82975833</id_utilisateur><nom_contact>Bestiee</nom_contact><telephone_contact>789999999</telephone_contact></contact></contacts>

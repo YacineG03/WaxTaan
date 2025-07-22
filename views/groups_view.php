@@ -24,12 +24,12 @@
                 <label class="form-label">Sélectionner les membres</label>
                 <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px;">
                     <?php
-                    foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) {
-                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+                    foreach ($contacts->xpath("//contact[id_utilisateur='$id_utilisateur']") as $contact) {
+                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->telephone_contact}']")[0];
                         if ($utilisateur_contact) {
                             echo "<label style='display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-radius: 6px; transition: background 0.3s ease;' onmouseover='this.style.background=\"var(--bg-secondary)\"' onmouseout='this.style.background=\"transparent\"'>";
                             echo "<input type='checkbox' name='ids_membres[]' value='" . htmlspecialchars($utilisateur_contact->id) . "' style='margin: 0;'>";
-                            echo "<span>" . htmlspecialchars($contact->contact_name) . "</span>";
+                            echo "<span>" . htmlspecialchars($contact->nom_contact) . "</span>";
                             echo "</label>";
                         }
                     }
@@ -38,21 +38,23 @@
                 <small class="form-help">Sélectionnez au moins 2 contacts pour créer un groupe</small>
             </div>
             <div class="form-actions">
+                <div class="button-group">
                 <button type="submit" class="modern-btn btn-primary">
                     <span>🏠</span>
                     Créer le Groupe
                 </button>
-                <button type="button" onclick="cacherFormulaireCreationGroupe()" class="modern-btn btn-secondary">
+                    <button type="button" onclick="cacherFormulaireCreationGroupe()" class="modern-btn btn-secondary">
                     <span>❌</span>
                     Annuler
                 </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
-  <div class="search-bar">
+<div class="search-bar">
     <input type="text" id="rechercheGroupes" placeholder="Rechercher un groupe...">
-  </div>
+</div>
 <div class="modern-list">
 <?php 
 // Afficher tous les groupes où l'utilisateur est membre OU admin
@@ -221,10 +223,10 @@ foreach ($groupes->group as $groupe) {
                 <select name="id_nouveau_membre" id="id_nouveau_membre" required>
                     <option value="">-- Choisir un contact --</option>
                     <?php
-                    foreach ($contacts->xpath("//contact[user_id='$id_utilisateur']") as $contact) {
-                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->contact_telephone}']")[0];
+                    foreach ($contacts->xpath("//contact[id_utilisateur='$id_utilisateur']") as $contact) {
+                        $utilisateur_contact = $utilisateurs->xpath("//user[telephone='{$contact->telephone_contact}']")[0];
                         if ($utilisateur_contact && !in_array((string)$utilisateur_contact->id, $ids_uniques)) {
-                            echo "<option value='" . htmlspecialchars($utilisateur_contact->id) . "'>" . htmlspecialchars($contact->contact_name) . " (" . htmlspecialchars($contact->contact_telephone) . ")</option>";
+                            echo "<option value='" . htmlspecialchars($utilisateur_contact->id) . "'>" . htmlspecialchars($contact->nom_contact) . " (" . htmlspecialchars($contact->telephone_contact) . ")</option>";
                         }
                     }
                     ?>
