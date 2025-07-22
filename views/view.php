@@ -310,11 +310,13 @@
                     <div class="chat-info" style="flex:1;">
                         <h3 style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
                             <?php echo $conversation_name; ?>
-                            <a href="?tab=discussions" class="modern-btn btn-danger btn-small" style="margin-left:16px;">✖</a>
-                            <!-- Bouton menu (3 points) -->
-                            <button type="button" class="chat-menu-btn" onclick="toggleChatMenu(event)" style="background:none;border:none;outline:none;cursor:pointer;padding:8px 12px;">
-                                <span style="display:inline-block;font-size:28px;line-height:1;vertical-align:middle;">&#8942;</span>
-                            </button>
+                            <span style="display:flex;align-items:center;gap:8px;">
+                                <a href="?tab=discussions" class="modern-btn btn-danger btn-small" style="margin-left:0;">✖</a>
+                                <!-- Bouton menu (3 points) -->
+                                <button type="button" class="chat-menu-btn" onclick="toggleChatMenu(event)" style="background:none;border:none;outline:none;cursor:pointer;padding:8px 12px;">
+                                    <span style="display:inline-block;font-size:28px;line-height:1;vertical-align:middle;">&#8942;</span>
+                                </button>
+                            </span>
                         </h3>
                         <div class="chat-status">
                             <?php if ($type === 'groupe' && $group_info) { ?>
