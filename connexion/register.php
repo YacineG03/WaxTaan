@@ -30,10 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nouvel_utilisateur->addChild('mdp', $mot_de_passe);
             if (!empty($_FILES['profile_photo']['name'])) {
                 $nom_fichier = uniqid() . '_' . basename($_FILES['profile_photo']['name']);
-                move_uploaded_file($_FILES['profile_photo']['tmp_name'], 'uploads/' . $nom_fichier);
+                move_uploaded_file($_FILES['profile_photo']['tmp_name'], '../uploads/' . $nom_fichier);
                 $nouvel_utilisateur->addChild('profile_photo', $nom_fichier);
             } else {
-                $nouvel_utilisateur->addChild('profile_photo', 'default.jpg');
+                $nouvel_utilisateur->addChild('profile_photo', 'default.png');
             }
             $utilisateurs->asXML('../xmls/users.xml');
             header('Location: login.php');

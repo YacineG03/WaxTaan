@@ -1,11 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <messages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schema/messages.xsd">
-<message><id>687d77a0a959c</id><id_expediteur>6871a82975833</id_expediteur><destinataire>700000000</destinataire><contenu>Salut Assy</contenu><lus_par>6871aa2634117</lus_par><date_heure>2025-07-21T01:11:28</date_heure></message>
-<message><id>687d77f1c5efb</id><id_expediteur>6871a82975833</id_expediteur><groupe_destinataire>687574af7b751</groupe_destinataire><contenu>Heeey girls&#13;
-</contenu><lus_par>6871a82975833,6871aa2634117</lus_par><date_heure>2025-07-21T01:12:49</date_heure></message>
-
-<message><id>687d78d4de829</id><id_expediteur>6871a82975833</id_expediteur><destinataire>700000000</destinataire><contenu>Ca va?</contenu><lus_par>6871aa2634117</lus_par><date_heure>2025-07-21T01:16:36</date_heure></message>
-
-<message><id>687e929cc4ab4</id><id_expediteur>687e9279f3ec1</id_expediteur><destinataire>777777777</destinataire><contenu>coucou</contenu><lus_par>6871a82975833</lus_par><date_heure>2025-07-21T21:18:52</date_heure></message>
-<message><id>687ec0b6f3aba</id><id_expediteur>6871a82975833</id_expediteur><destinataire>700000000</destinataire><contenu>Ca va Alhamdoulilah</contenu><lus_par>6871aa2634117</lus_par><date_heure>2025-07-22T00:35:34</date_heure></message>
-<message><id>687ec2eac3b89</id><id_expediteur>6871a82975833</id_expediteur><destinataire>700000000</destinataire><contenu>Et la famille?</contenu><lus_par>6871aa2634117</lus_par><date_heure>2025-07-22T00:44:58</date_heure></message><message><id>687ef210c7a74</id><id_expediteur>6871a82975833</id_expediteur><destinataire>700000000</destinataire><contenu>New outfit</contenu><fichier>687ef210c7a80_Capture d’écran 2024-10-10 172702.png</fichier><lus_par/><date_heure>2025-07-22T04:06:08</date_heure></message><message><id>687ef2469d52e</id><id_expediteur>6871a82975833</id_expediteur><destinataire>789999999</destinataire><contenu>AYADE RESCUE</contenu><fichier>687ef2469d535_bandicam 2024-07-23 11-56-49-500.mp4</fichier><lus_par/><date_heure>2025-07-22T04:07:02</date_heure></message></messages>
+    <message>
+        <id>687d77a0a959c</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>700000000</destinataire>
+        <contenu>Salut Assy</contenu>
+        <lus_par>6871aa2634117</lus_par>
+        <date_heure>2025-07-21T01:11:28</date_heure>
+    </message>
+    <message>
+        <id>687d77f1c5efb</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <groupe_destinataire>687574af7b751</groupe_destinataire>
+        <contenu>Heeey girls&#13;</contenu>
+        <lus_par>6871a82975833,6871aa2634117,6871ae9cd9e8d</lus_par>
+        <date_heure>2025-07-21T01:12:49</date_heure>
+    </message>
+    <message>
+        <id>687d78d4de829</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>700000000</destinataire>
+        <contenu>Ca va?</contenu>
+        <lus_par>6871aa2634117</lus_par>
+        <date_heure>2025-07-21T01:16:36</date_heure>
+    </message>
+    <message>
+        <id>687e929cc4ab4</id>
+        <id_expediteur>687e9279f3ec1</id_expediteur>
+        <destinataire>777777777</destinataire>
+        <contenu>coucou</contenu>
+        <lus_par>6871a82975833</lus_par>
+        <date_heure>2025-07-21T21:18:52</date_heure>
+    </message>
+    <message>
+        <id>687ec0b6f3aba</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>700000000</destinataire>
+        <contenu>Ca va Alhamdoulilah</contenu>
+        <lus_par>6871aa2634117</lus_par>
+        <date_heure>2025-07-22T00:35:34</date_heure>
+    </message>
+    <message>
+        <id>687ec2eac3b89</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>700000000</destinataire>
+        <contenu>Et la famille?</contenu>
+        <lus_par>6871aa2634117</lus_par>
+        <date_heure>2025-07-22T00:44:58</date_heure>
+    </message>
+    <message>
+        <id>687ef210c7a74</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>700000000</destinataire>
+        <contenu>New outfit</contenu>
+        <fichier>687ef210c7a80_Capture d’écran 2024-10-10 172702.png</fichier>
+        <lus_par>6871aa2634117</lus_par>
+        <date_heure>2025-07-22T04:06:08</date_heure>
+    </message>
+    <message>
+        <id>687ef2469d52e</id>
+        <id_expediteur>6871a82975833</id_expediteur>
+        <destinataire>789999999</destinataire>
+        <contenu>AYADE RESCUE</contenu>
+        <fichier>687ef2469d535_bandicam 2024-07-23 11-56-49-500.mp4</fichier>
+        <lus_par/>
+        <date_heure>2025-07-22T04:07:02</date_heure>
+    </message>
+<message><id>687fab7f38fc3</id><id_expediteur>6871ae9cd9e8d</id_expediteur><groupe_destinataire>687574af7b751</groupe_destinataire><contenu/><fichier>687fab7f38fcb_2.png</fichier><lus_par>6871ae9cd9e8d</lus_par><date_heure>2025-07-22T17:17:19</date_heure></message></messages>

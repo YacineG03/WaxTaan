@@ -42,11 +42,11 @@ switch ($action) {
                 $utilisateur_courant->telephone = $nouveau_telephone;
                 
                 // Gestion de la photo de profil
-                if (isset($_FILES['photo_profil']) && $_FILES['photo_profil']['error'] === UPLOAD_ERR_OK) {
+                if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
                     $upload_dir = 'uploads/';
-                    $nom_fichier = uniqid() . '_' . basename($_FILES['photo_profil']['name']);
+                    $nom_fichier = uniqid() . '_' . basename($_FILES['profile_photo']['name']);
                     $fichier_cible = $upload_dir . $nom_fichier;
-                    if (move_uploaded_file($_FILES['photo_profil']['tmp_name'], $fichier_cible)) {
+                    if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $fichier_cible)) {
                         $utilisateur_courant->profile_photo = $nom_fichier;
                     }
                 }

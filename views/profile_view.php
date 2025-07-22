@@ -1,8 +1,8 @@
 <div class="profile-section">
     <div class="profile-header">
         <div class="profile-avatar">
-            <?php if ($utilisateur_courant->photo_profil && $utilisateur_courant->photo_profil != 'default.jpg') { ?>
-                <img src="../uploads/<?php echo htmlspecialchars($utilisateur_courant->photo_profil); ?>" alt="Photo de profil">
+            <?php if ($utilisateur_courant->profile_photo && $utilisateur_courant->profile_photo != 'default.png') { ?>
+                <img src="../uploads/<?php echo htmlspecialchars($utilisateur_courant->profile_photo); ?>" alt="Photo de profil">
             <?php } else { ?>
                 <?php echo strtoupper(substr($utilisateur_courant->prenom, 0, 1)); ?>
             <?php } ?>
@@ -42,7 +42,7 @@
         </div>
         <div class="form-group">
             <label class="form-label">Photo de profil</label>
-            <input type="file" name="photo_profil" class="form-input" accept="image/*">
+            <input type="file" name="profile_photo" class="form-input" accept="image/*">
         </div>
         <button type="submit" class="modern-btn btn-primary">
             <span>💾</span> Mettre à jour
